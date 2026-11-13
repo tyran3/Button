@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Button</title>
+  <style>
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      background: #f4f4f5;
+      font-family: system-ui, sans-serif;
+    }
+
+    button {
+      padding: 0.8rem 1.4rem;
+      border: 0;
+      border-radius: 0.6rem;
+      background: #2563eb;
+      color: white;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgb(37 99 235 / 25%);
+      transition: background 150ms ease, transform 150ms ease;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    button:focus-visible {
+      outline: 3px solid #93c5fd;
+      outline-offset: 3px;
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <button type="button" id="action-button">Click me</button>
+  <script>
+    document.querySelector('#action-button').addEventListener('click', (event) => {
+      event.currentTarget.textContent = 'Clicked!';
+    });
+  </script>
+</body>
+</html>

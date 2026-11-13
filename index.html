@@ -40,6 +40,21 @@
         uiStyles.rel = 'stylesheet';
         uiStyles.href = new URL('ui-restore.css', window.location.href).href;
         document.head.appendChild(uiStyles);
+        const uiFixes = document.createElement('link');
+        uiFixes.rel = 'stylesheet';
+        uiFixes.href = new URL('ui-fixes.css', window.location.href).href;
+        document.head.appendChild(uiFixes);
+        document.addEventListener('click', (event) => {
+          const clockButton = event.target.closest('#clock-toggle');
+          if (!clockButton) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          const panel = document.querySelector('#time-panel');
+          if (!panel) return;
+          const expanded = panel.classList.toggle('open');
+          clockButton.setAttribute('aria-expanded', String(expanded));
+          panel.setAttribute('aria-hidden', String(!expanded));
+        }, true);
         const effects = document.createElement('script');
         effects.src = new URL('shutdown-effects.js', window.location.href).href;
         effects.onerror = () => console.error('Could not load shutdown effects.');

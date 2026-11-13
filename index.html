@@ -29,40 +29,42 @@
 <body>
   <p id="status">Loading the game…</p>
   <script>
-    const previousGameUrl = 'https://raw.githubusercontent.com/tyran3/Button/23eb82fc1c5acfaa70da3e83760adf1dfab7a3ea/Main%20Content';
-    fetch(previousGameUrl, { cache: 'no-store' })
+    const gameUrl = 'https://raw.githubusercontent.com/tyran3/Button/23eb82fc1c5acfaa70da3e83760adf1dfab7a3ea/Main%20Content';
+    fetch(gameUrl, { cache: 'no-store' })
       .then((response) => {
         if (!response.ok) throw new Error(`Could not load game file (${response.status}).`);
         return response.text();
       })
-      .then((html) => {
+      .then((source) => {
+        let html = source;
+        // Clamp the token timer at zero and restart it after a token celebration.
+        html = html.replace(/countdown\s*--\s*;\s*if\s*\(\s*countdown\s*<=\s*0\s*\)\s*rollForToken\s*\(\s*\)\s*;/g,
+          'countdown=Math.max(0,countdown-1);if(countdown===0){rollForToken();if(phase===\'rolling\'&&countdown===0)countdown=10;}');
+        html = html.replace(/setTimeout\s*\(\s*\(\s*\)\s*=>\s*\{\s*phase\s*=\s*['"]rolling['"]\s*;/g,
+          (match) => match + 'countdown=10;');
         document.open();
         document.write(html);
         document.close();
 
-        for (const file of ['ui-restore.css', 'ui-fixes.css']) {
-          const stylesheet = document.createElement('link');
-          stylesheet.rel = 'stylesheet';
-          stylesheet.href = new URL(file, window.location.href).href;
-          document.head.appendChild(stylesheet);
-        }
+        const fixes = document.createElement('link');
+        fixes.rel = 'stylesheet';
+        fixes.href = new URL('ui-fixes.css', window.location.href).href;
+        document.head.appendChild(fixes);
 
         const count = document.getElementById('count');
-        if (count) {
+        if (count && !document.querySelector('.rainbow-credit')) {
           const credit = document.createElement('p');
           credit.className = 'rainbow-credit';
           credit.textContent = 'Made By tyran, WAWA, cart';
           count.before(credit);
         }
 
-        const panelLock = document.createElement('script');
-        panelLock.src = new URL('panel-lock.js', window.location.href).href;
-        document.body.appendChild(panelLock);
-
-        const effects = document.createElement('script');
-        effects.src = new URL('shutdown-effects.js', window.location.href).href;
-        effects.onerror = () => console.error('Could not load shutdown effects.');
-        document.body.appendChild(effects);
+        for (const scriptName of ['panel-lock.js', 'shutdown-effects.js']) {
+          const script = document.createElement('script');
+          script.src = new URL(scriptName, window.location.href).href;
+          script.onerror = () => console.error(`Could not load ${scriptName}.`);
+          document.body.appendChild(script);
+        }
       })
       .catch((error) => {
         document.querySelector('#status').textContent =

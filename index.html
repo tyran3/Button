@@ -70,15 +70,15 @@
       position: fixed;
       z-index: 2;
       top: 50%;
-      right: 0;
+      left: 0;
       width: min(340px, calc(100vw - 48px));
       padding: 24px;
       border: 1px solid #e4e4e7;
-      border-right: 0;
-      border-radius: 16px 0 0 16px;
+      border-left: 0;
+      border-radius: 0 16px 16px 0;
       background: #fff;
       box-shadow: 0 12px 35px rgb(24 24 27 / 18%);
-      transform: translate(100%, -50%);
+      transform: translate(-100%, -50%);
       transition: transform 300ms cubic-bezier(.2, .8, .2, 1);
     }
 
@@ -89,19 +89,19 @@
     .drawer-toggle {
       position: absolute;
       top: 20px;
-      left: -44px;
+      right: -44px;
       width: 44px;
       height: 52px;
       display: grid;
       place-items: center;
       border: 1px solid #e4e4e7;
-      border-right: 0;
-      border-radius: 12px 0 0 12px;
+      border-left: 0;
+      border-radius: 0 12px 12px 0;
       background: #fff;
       color: #18181b;
       font-size: 1.5rem;
       cursor: pointer;
-      box-shadow: -6px 6px 18px rgb(24 24 27 / 10%);
+      box-shadow: 6px 6px 18px rgb(24 24 27 / 10%);
     }
 
     .drawer-content {
@@ -184,7 +184,7 @@
   </main>
 
   <aside class="side-drawer" id="side-drawer" aria-label="Rebirth settings">
-    <button class="drawer-toggle" id="drawer-toggle" type="button" aria-label="Open side panel" aria-expanded="false" aria-controls="drawer-content">‹</button>
+    <button class="drawer-toggle" id="drawer-toggle" type="button" aria-label="Open side panel" aria-expanded="false" aria-controls="drawer-content">›</button>
     <div class="drawer-content" id="drawer-content" aria-hidden="true">
       <div class="rebirth-bubble">
         <p class="rebirth-title">Rebirth</p>
@@ -195,9 +195,25 @@
   </aside>
 
   <script>
+    const SAVE_KEY = 'click-counter-save';
     let clicks = 0;
     let rebirths = 0;
     let autoRebirth = false;
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+      if (saved && Number.isSafeInteger(saved.clicks) && saved.clicks >= 0) {
+        clicks = saved.clicks;
+      }
+      if (saved && Number.isSafeInteger(saved.rebirths) && saved.rebirths >= 0) {
+        rebirths = saved.rebirths;
+      }
+      if (saved && typeof saved.autoRebirth === 'boolean') {
+        autoRebirth = saved.autoRebirth;
+      }
+    } catch (error) {
+      console.warn('Could not load the saved game.', error);
+    }
 
     const count = document.querySelector('#count');
     const rebirthCount = document.querySelector('#rebirth-count');
@@ -206,10 +222,22 @@
     const drawerContent = document.querySelector('#drawer-content');
     const autoToggle = document.querySelector('#auto-toggle');
 
+    function saveGame() {
+      try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify({ clicks, rebirths, autoRebirth }));
+      } catch (error) {
+        console.warn('Could not save the game in this browser.', error);
+      }
+    }
+
     function updateCounter() {
       count.textContent = `Clicks: ${clicks}`;
       rebirthCount.textContent = `Rebirths: ${rebirths}`;
+      autoToggle.setAttribute('aria-pressed', String(autoRebirth));
+      autoToggle.textContent = autoRebirth ? 'Auto On' : 'Auto Off';
     }
+
+    updateCounter();
 
     document.querySelector('#action-button').addEventListener('click', () => {
       clicks += 1;
@@ -222,28 +250,29 @@
       }
 
       updateCounter();
+      saveGame();
     });
 
     drawerToggle.addEventListener('click', () => {
       const isOpen = drawer.classList.toggle('is-open');
       drawerToggle.setAttribute('aria-expanded', String(isOpen));
       drawerToggle.setAttribute('aria-label', isOpen ? 'Close side panel' : 'Open side panel');
-      drawerToggle.textContent = isOpen ? '›' : '‹';
+      drawerToggle.textContent = isOpen ? '‹' : '›';
       drawerContent.setAttribute('aria-hidden', String(!isOpen));
     });
 
     autoToggle.addEventListener('click', () => {
       autoRebirth = !autoRebirth;
-      autoToggle.setAttribute('aria-pressed', String(autoRebirth));
-      autoToggle.textContent = autoRebirth ? 'Auto On' : 'Auto Off';
 
       if (autoRebirth && clicks >= 100) {
         while (clicks >= 100) {
           clicks -= 100;
           rebirths += 1;
         }
-        updateCounter();
       }
+
+      updateCounter();
+      saveGame();
     });
   </script>
 </body>

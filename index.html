@@ -19,6 +19,13 @@
       display: grid;
       justify-items: center;
       gap: 1rem;
+      transform: translateY(-1.5rem);
+    }
+
+    #count {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
     }
 
     button {
@@ -51,20 +58,14 @@
       height: 100%;
       object-fit: contain;
     }
-
-    #count {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
   </style>
 </head>
 <body>
   <main>
+    <p id="count" aria-live="polite">Clicks: 0</p>
     <button type="button" id="action-button" aria-label="Click the F emblem">
       <img src="f-button.svg" alt="Golden F compass emblem">
     </button>
-    <p id="count" aria-live="polite">Clicks: 0</p>
   </main>
   <script>
     let clicks = 0;

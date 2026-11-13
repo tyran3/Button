@@ -172,10 +172,89 @@
       background: #15803d;
     }
 
+    .fact-popup {
+      position: fixed;
+      z-index: 5;
+      width: min(240px, calc(100vw - 16px));
+      overflow: hidden;
+      border: 1px solid #cbd0d8;
+      border-radius: 9px;
+      background: #fff;
+      color: #272a30;
+      box-shadow: 0 8px 26px rgb(0 0 0 / 24%);
+      animation: popup-appear 180ms ease-out;
+    }
+
+    .fact-popup__bar {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 4px 5px 4px 10px;
+      background: #e5e7eb;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .fact-popup__bar:active {
+      cursor: grabbing;
+    }
+
+    .fact-popup__tab {
+      max-width: 180px;
+      overflow: hidden;
+      color: #424650;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .fact-popup__close {
+      width: 26px;
+      height: 26px;
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+      color: #3f434b;
+      font: inherit;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 120ms ease, color 120ms ease;
+    }
+
+    .fact-popup__close:hover {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .fact-popup__body {
+      min-height: 92px;
+      display: grid;
+      align-content: center;
+      padding: 14px;
+    }
+
+    .fact-popup__body p {
+      margin: 0;
+      font-size: 0.875rem;
+      line-height: 1.45;
+    }
+
+    @keyframes popup-appear {
+      from { opacity: 0; transform: scale(.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
       }
     }
   </style>
@@ -279,6 +358,86 @@
       updateCounter();
       saveGame();
     });
+
+    const funFacts = [
+      'Octopuses have three hearts, and two of them stop beating when they swim.',
+      'A group of flamingos is called a flamboyance.',
+      'Bananas are berries, but strawberries are not.',
+      'The Moon moves away from Earth by about 3.8 centimeters each year.',
+      'Wombat poop is cube-shaped.',
+      'A day on Venus is longer than its year.',
+      'Honey can remain edible for thousands of years when sealed well.',
+      'Sea otters sometimes hold hands while they sleep so they do not drift apart.',
+      'The Eiffel Tower can grow taller in hot weather as its metal expands.',
+      'Some turtles can breathe through specialized tissues in their rear ends.'
+    ];
+    let previousFactIndex = -1;
+
+    function showRandomFact() {
+      const popup = document.createElement('section');
+      popup.className = 'fact-popup';
+      popup.setAttribute('aria-label', "Tyran's ad: random fun fact");
+
+      const bar = document.createElement('div');
+      bar.className = 'fact-popup__bar';
+
+      const tab = document.createElement('span');
+      tab.className = 'fact-popup__tab';
+      tab.textContent = "tyran's ad";
+
+      const close = document.createElement('button');
+      close.className = 'fact-popup__close';
+      close.type = 'button';
+      close.setAttribute('aria-label', 'Close popup');
+      close.textContent = '×';
+      close.addEventListener('click', () => popup.remove());
+      bar.append(tab, close);
+
+      const body = document.createElement('div');
+      body.className = 'fact-popup__body';
+      const fact = document.createElement('p');
+      let factIndex = Math.floor(Math.random() * funFacts.length);
+      if (funFacts.length > 1 && factIndex === previousFactIndex) {
+        factIndex = (factIndex + 1 + Math.floor(Math.random() * (funFacts.length - 1))) % funFacts.length;
+      }
+      previousFactIndex = factIndex;
+      fact.textContent = funFacts[factIndex];
+      body.append(fact);
+      popup.append(bar, body);
+      document.body.append(popup);
+
+      const placePopup = () => {
+        const margin = 8;
+        const maxX = Math.max(margin, window.innerWidth - popup.offsetWidth - margin);
+        const maxY = Math.max(margin, window.innerHeight - popup.offsetHeight - margin);
+        popup.style.left = `${margin + Math.random() * (maxX - margin)}px`;
+        popup.style.top = `${margin + Math.random() * (maxY - margin)}px`;
+      };
+      placePopup();
+
+      let drag = null;
+      bar.addEventListener('pointerdown', (event) => {
+        if (event.target === close) return;
+        const rect = popup.getBoundingClientRect();
+        drag = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+        bar.setPointerCapture(event.pointerId);
+      });
+      bar.addEventListener('pointermove', (event) => {
+        if (!drag) return;
+        const maxX = Math.max(0, window.innerWidth - popup.offsetWidth);
+        const maxY = Math.max(0, window.innerHeight - popup.offsetHeight);
+        popup.style.left = `${Math.max(0, Math.min(maxX, event.clientX - drag.x))}px`;
+        popup.style.top = `${Math.max(0, Math.min(maxY, event.clientY - drag.y))}px`;
+      });
+      const stopDragging = () => { drag = null; };
+      bar.addEventListener('pointerup', stopDragging);
+      bar.addEventListener('pointercancel', stopDragging);
+      window.addEventListener('resize', () => {
+        if (popup.isConnected) placePopup();
+      }, { once: true });
+    }
+
+    window.setInterval(showRandomFact, 5000);
   </script>
 </body>
 </html>

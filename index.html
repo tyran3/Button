@@ -7,100 +7,443 @@
   <title>Click Counter</title>
   <style>
     * { box-sizing: border-box; }
-    body { min-height: 100vh; margin: 0; display: grid; place-items: center; overflow: hidden; background: #f4f4f5; color: #18181b; font-family: system-ui, sans-serif; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #f4f4f5;
+      color: #18181b;
+      font-family: system-ui, sans-serif;
+    }
+
     button { font: inherit; cursor: pointer; }
-    #reset-progress { position: fixed; z-index: 4; top: 14px; left: 14px; padding: 10px 14px; border: 2px solid #991b1b; border-radius: 8px; background: #dc2626; color: #fff; font-size: .8rem; font-weight: 800; }
+
+    #reset-progress {
+      position: fixed;
+      z-index: 4;
+      top: 14px;
+      left: 14px;
+      padding: 10px 14px;
+      border: 2px solid #991b1b;
+      border-radius: 8px;
+      background: #dc2626;
+      color: #fff;
+      font-size: .8rem;
+      font-weight: 800;
+    }
+
     #reset-progress:hover { background: #b91c1c; }
-    main { display: grid; justify-items: center; gap: 12px; transition: opacity 60s linear, filter 60s linear, scale 60s linear; }
+
+    main {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      transition: opacity 60s linear, filter 60s linear, scale 60s linear;
+    }
+
     #count { margin: 0; font-size: 1.35rem; font-weight: 700; }
-    #action-button { width: min(60vw, 240px); aspect-ratio: 1; padding: 0; border: 0; border-radius: 50%; background: transparent; transition: transform 150ms ease; }
+
+    #action-button {
+      width: min(60vw, 240px);
+      aspect-ratio: 1;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      transition: transform 150ms ease;
+    }
+
     #action-button:hover { transform: scale(1.05); }
     #action-button:active { transform: scale(.97); }
-    #action-button img { display: block; width: 100%; height: 100%; object-fit: contain; }
-    #timer-label { max-width: min(90vw, 380px); margin: 0; text-align: center; font-size: .95rem; font-weight: 650; }
-    .drawer { position: fixed; z-index: 3; width: min(360px, calc(100vw - 48px)); padding: 20px; border: 1px solid #e4e4e7; background: #fff; box-shadow: 0 12px 35px rgb(24 24 27 / 18%); transition: transform 350ms cubic-bezier(.2,.8,.2,1), opacity 60s linear, filter 60s linear, scale 60s linear; }
-    #rebirth-drawer { top: 50%; left: 0; border-left: 0; border-radius: 0 16px 16px 0; transform: translate(-100%,-50%); }
-    #rebirth-drawer.open { transform: translate(0,-50%); }
-    .edge-toggle { position: absolute; display: grid; place-items: center; width: 44px; height: 52px; border: 1px solid #e4e4e7; background: #fff; font-size: 1.5rem; }
-    #rebirth-toggle { top: 20px; right: -44px; border-left: 0; border-radius: 0 12px 12px 0; box-shadow: 6px 6px 18px rgb(24 24 27 / 10%); }
+
+    #action-button img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #timer-label {
+      max-width: min(90vw, 380px);
+      margin: 0;
+      text-align: center;
+      font-size: .95rem;
+      font-weight: 650;
+    }
+
+    .drawer {
+      position: fixed;
+      z-index: 3;
+      width: min(360px, calc(100vw - 48px));
+      padding: 20px;
+      border: 1px solid #e4e4e7;
+      background: #fff;
+      box-shadow: 0 12px 35px rgb(24 24 27 / 18%);
+      transition: transform 350ms cubic-bezier(.2, .8, .2, 1),
+                  opacity 60s linear, filter 60s linear, scale 60s linear;
+    }
+
+    #rebirth-drawer {
+      top: 50%;
+      left: 0;
+      border-left: 0;
+      border-radius: 0 16px 16px 0;
+      transform: translate(-100%, -50%);
+    }
+
+    #rebirth-drawer.open { transform: translate(0, -50%); }
+
+    .edge-toggle {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 52px;
+      border: 1px solid #e4e4e7;
+      background: #fff;
+      font-size: 1.5rem;
+    }
+
+    #rebirth-toggle {
+      top: 20px;
+      right: -44px;
+      border-left: 0;
+      border-radius: 0 12px 12px 0;
+      box-shadow: 6px 6px 18px rgb(24 24 27 / 10%);
+    }
+
     .rebirth-list { display: grid; gap: 10px; }
-    .bubble { padding: 12px 14px; border: 1px solid #e4e4e7; border-radius: 14px; background: #f8fafc; font-weight: 650; }
+
+    .bubble {
+      padding: 12px 14px;
+      border: 1px solid #e4e4e7;
+      border-radius: 14px;
+      background: #f8fafc;
+      font-weight: 650;
+    }
+
     .bubble p { margin: 0; }
-    .bubble small { display: block; margin-top: 4px; color: #52525b; font-size: .85rem; font-weight: 500; }
-    .auto-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .toggle-button { min-width: 90px; padding: 11px 14px; border: 0; border-radius: 10px; background: #dc2626; color: #fff; font-weight: 750; }
+
+    .bubble small {
+      display: block;
+      margin-top: 4px;
+      color: #52525b;
+      font-size: .85rem;
+      font-weight: 500;
+    }
+
+    .auto-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .toggle-button {
+      min-width: 90px;
+      padding: 11px 14px;
+      border: 0;
+      border-radius: 10px;
+      background: #dc2626;
+      color: #fff;
+      font-weight: 750;
+    }
+
     .toggle-button[aria-pressed="true"] { background: #16a34a; }
-    #access-drawer { right: 0; bottom: 0; padding: 18px; border-right: 0; border-bottom: 0; border-radius: 16px 0 0 0; transform: translate(100%,100%); }
-    #access-drawer.open { transform: translate(0,0); }
-    #access-toggle { top: -50px; left: -50px; width: 50px; height: 50px; border-right: 0; border-bottom: 0; border-radius: 14px 0 0 0; box-shadow: -6px -6px 18px rgb(24 24 27 / 10%); }
+
+    #access-drawer {
+      right: 0;
+      bottom: 0;
+      padding: 18px;
+      border-right: 0;
+      border-bottom: 0;
+      border-radius: 16px 0 0 0;
+      transform: translate(100%, 100%);
+    }
+
+    #access-drawer.open { transform: translate(0, 0); }
+
+    #access-toggle {
+      top: -50px;
+      left: -50px;
+      width: 50px;
+      height: 50px;
+      border-right: 0;
+      border-bottom: 0;
+      border-radius: 14px 0 0 0;
+      box-shadow: -6px -6px 18px rgb(24 24 27 / 10%);
+    }
+
     .rainbow { display: inline-block; animation: rainbow 2s linear infinite; }
-    @keyframes rainbow { 0%{color:#ef4444} 17%{color:#f97316} 33%{color:#eab308} 50%{color:#22c55e} 67%{color:#3b82f6} 83%{color:#a855f7} 100%{color:#ef4444} }
-    .access-content { display: grid; gap: 10px; max-height: min(65vh,520px); overflow: auto; }
+
+    @keyframes rainbow {
+      0% { color: #ef4444; }
+      17% { color: #f97316; }
+      33% { color: #eab308; }
+      50% { color: #22c55e; }
+      67% { color: #3b82f6; }
+      83% { color: #a855f7; }
+      100% { color: #ef4444; }
+    }
+
+    .access-content {
+      display: grid;
+      gap: 10px;
+      max-height: min(65vh, 520px);
+      overflow: auto;
+    }
+
     .panel-heading { margin: 0; font-size: 1rem; }
+
     .password-box { display: grid; gap: 10px; }
-    #password-display { width: 100%; padding: 11px; border: 1px solid #d4d4d8; border-radius: 9px; background: #fafafa; font-size: 1.25rem; letter-spacing: .45em; text-align: center; }
-    .keypad { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; }
-    .keypad button { min-height: 44px; border: 1px solid #d4d4d8; border-radius: 8px; background: #f4f4f5; font-size: 1.05rem; font-weight: 700; }
+
+    #password-display {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #d4d4d8;
+      border-radius: 9px;
+      background: #fafafa;
+      font-size: 1.25rem;
+      letter-spacing: .45em;
+      text-align: center;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+
+    .keypad button {
+      min-height: 44px;
+      border: 1px solid #d4d4d8;
+      border-radius: 8px;
+      background: #f4f4f5;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
     .keypad button:hover { background: #e4e4e7; }
+
     .password-actions { display: flex; gap: 8px; }
-    .password-actions button, .bonus-button { flex: 1; padding: 10px; border: 0; border-radius: 8px; background: #2563eb; color: #fff; font-weight: 700; }
+
+    .password-actions button, .bonus-button {
+      flex: 1;
+      padding: 10px;
+      border: 0;
+      border-radius: 8px;
+      background: #2563eb;
+      color: #fff;
+      font-weight: 700;
+    }
+
     .password-actions .clear-key { background: #71717a; }
-    #password-error { min-height: 1.2em; margin: 0; color: #dc2626; font-size: .85rem; }
+    .password-actions button:hover, .bonus-button:hover { filter: brightness(.92); }
+
+    #password-error {
+      min-height: 1.2em;
+      margin: 0;
+      color: #dc2626;
+      font-size: .85rem;
+    }
+
     #private-tools { display: none; gap: 9px; }
     #private-tools.unlocked { display: grid; }
     .bonus-button { width: 100%; }
-    .fact-popup { position: fixed; z-index: 5; width: min(240px,calc(100vw - 16px)); overflow: hidden; border: 1px solid #cbd0d8; border-radius: 9px; background: #fff; color: #272a30; box-shadow: 0 8px 26px rgb(0 0 0 / 24%); animation: popup-appear 180ms ease-out; transition: opacity 60s linear, filter 60s linear, scale 60s linear; }
-    .fact-bar { min-height: 34px; display: flex; align-items: center; gap: 8px; padding: 4px 5px 4px 10px; background: #e5e7eb; cursor: grab; touch-action: none; user-select: none; }
+
+    .fact-popup {
+      position: fixed;
+      z-index: 5;
+      width: min(240px, calc(100vw - 16px));
+      overflow: hidden;
+      border: 1px solid #cbd0d8;
+      border-radius: 9px;
+      background: #fff;
+      color: #272a30;
+      box-shadow: 0 8px 26px rgb(0 0 0 / 24%);
+      animation: popup-appear 180ms ease-out;
+      transition: opacity 60s linear, filter 60s linear, scale 60s linear;
+    }
+
+    .fact-bar {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 5px 4px 10px;
+      background: #e5e7eb;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+
     .fact-bar:active { cursor: grabbing; }
     .fact-tab { margin-right: auto; font-size: .75rem; font-weight: 650; }
-    .fact-close { width: 26px; height: 26px; border: 0; border-radius: 5px; background: transparent; font-size: 1.1rem; }
+
+    .fact-close {
+      width: 26px;
+      height: 26px;
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+      font-size: 1.1rem;
+    }
+
     .fact-close:hover { background: #dc2626; color: #fff; }
-    .fact-body { min-height: 92px; display: grid; align-content: center; padding: 14px; font-size: .875rem; line-height: 1.45; }
+
+    .fact-body {
+      min-height: 92px;
+      display: grid;
+      align-content: center;
+      padding: 14px;
+      font-size: .875rem;
+      line-height: 1.45;
+    }
+
     .fact-body p { margin: 0; }
-    #celebration-layer { position: fixed; z-index: 8; inset: 0; overflow: hidden; pointer-events: none; }
-    .confetti { position: absolute; top: -18px; width: 10px; height: 16px; animation: confetti-fall 3s linear forwards; }
-    @keyframes confetti-fall { to { transform: translate3d(var(--drift),110vh,0) rotate(900deg); opacity: .8; } }
-    body.celebrating #action-button { animation: party 500ms ease-in-out infinite alternate; }
-    @keyframes party { to { filter: drop-shadow(0 0 24px #facc15); transform: scale(1.07) rotate(4deg); } }
-    body.shutdown .collapsible { opacity: 0; filter: blur(8px); scale: .03; pointer-events: none; }
-    #event-status { position: fixed; z-index: 10; right: 12px; bottom: 12px; left: 12px; margin: 0 auto; width: fit-content; max-width: calc(100vw - 24px); padding: 10px 16px; border: 1px solid #d4d4d8; border-radius: 12px; background: rgb(255 255 255 / 94%); text-align: center; font-weight: 750; box-shadow: 0 4px 18px rgb(0 0 0 / 12%); }
-    #restore-flash { position: fixed; z-index: 9; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+
+    #celebration-layer {
+      position: fixed;
+      z-index: 8;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -18px;
+      width: 10px;
+      height: 16px;
+      animation: confetti-fall 3s linear forwards;
+    }
+
+    @keyframes confetti-fall {
+      to { transform: translate3d(var(--drift), 110vh, 0) rotate(900deg); opacity: .8; }
+    }
+
+    body.celebrating #action-button {
+      animation: party 500ms ease-in-out infinite alternate;
+    }
+
+    @keyframes party {
+      to { filter: drop-shadow(0 0 24px #facc15); transform: scale(1.07) rotate(4deg); }
+    }
+
+    body.shutdown .collapsible {
+      opacity: 0;
+      filter: blur(8px);
+      scale: .03;
+      pointer-events: none;
+    }
+
+    #event-status {
+      position: fixed;
+      z-index: 10;
+      right: 12px;
+      bottom: 12px;
+      left: 12px;
+      margin: 0 auto;
+      width: fit-content;
+      max-width: calc(100vw - 24px);
+      padding: 10px 16px;
+      border: 1px solid #d4d4d8;
+      border-radius: 12px;
+      background: rgb(255 255 255 / 94%);
+      text-align: center;
+      font-weight: 750;
+      box-shadow: 0 4px 18px rgb(0 0 0 / 12%);
+    }
+
+    #restore-flash {
+      position: fixed;
+      z-index: 9;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none;
+    }
+
     #restore-flash.flash { animation: restore-flash 800ms ease-out; }
-    @keyframes restore-flash { 0%{opacity:0} 35%{opacity:.9} 100%{opacity:0} }
-    @keyframes popup-appear { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:scale(1)} }
-    @media (prefers-reduced-motion: reduce) { *,*::before,*::after { transition-duration:.01ms!important; animation-duration:.01ms!important; } }
+
+    @keyframes restore-flash {
+      0% { opacity: 0; }
+      35% { opacity: .9; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes popup-appear {
+      from { opacity: 0; transform: scale(.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+      }
+    }
   </style>
 </head>
 <body>
   <button class="collapsible" id="reset-progress" type="button">RESET ALL PROGRESS</button>
+
   <main class="collapsible">
     <p id="count" aria-live="polite">Clicks: 0</p>
-    <button id="action-button" type="button" aria-label="Click the F emblem"><img src="f-button.svg" alt="Golden F compass emblem"></button>
+    <button id="action-button" type="button" aria-label="Click the F emblem">
+      <img src="f-button.svg" alt="Golden F compass emblem">
+    </button>
     <p id="timer-label" aria-live="polite">10 Seconds | Pirate Shop Token Chance: 1/137,500</p>
   </main>
 
   <aside class="drawer collapsible" id="rebirth-drawer" aria-label="Rebirth settings">
-    <button class="edge-toggle" id="rebirth-toggle" type="button" aria-label="Open rebirth panel" aria-expanded="false" aria-controls="rebirth-content">›</button>
+    <button class="edge-toggle" id="rebirth-toggle" type="button"
+      aria-label="Open rebirth panel" aria-expanded="false" aria-controls="rebirth-content">›</button>
     <div class="rebirth-list" id="rebirth-content" aria-hidden="true">
-      <div class="bubble"><p>Rebirth</p><small id="rebirth-count">Rebirths: 0</small></div>
-      <div class="bubble"><p>Pirate Shop Token Chance</p><small id="chance-display">1/137,500</small></div>
-      <div class="bubble"><p>Pirate Shop Tokens | PERMANENT: <span id="token-count">0</span></p></div>
-      <div class="bubble auto-row"><p>Auto rebirth<small>Rebirth every 100 clicks</small></p><button class="toggle-button" id="rebirth-auto" type="button" aria-pressed="false">Auto Off</button></div>
+      <div class="bubble">
+        <p>Rebirth</p>
+        <small id="rebirth-count">Rebirths: 0</small>
+      </div>
+      <div class="bubble">
+        <p>Pirate Shop Token Chance</p>
+        <small id="chance-display">1/137,500</small>
+      </div>
+      <div class="bubble">
+        <p>Pirate Shop Tokens | PERMANENT: <span id="token-count">0</span></p>
+      </div>
+      <div class="bubble auto-row">
+        <p>Auto rebirth<small>Rebirth every 100 clicks</small></p>
+        <button class="toggle-button" id="rebirth-auto" type="button" aria-pressed="false">Auto Off</button>
+      </div>
     </div>
   </aside>
 
   <aside class="drawer collapsible" id="access-drawer" aria-label="Tyran's panel only">
-    <button class="edge-toggle" id="access-toggle" type="button" aria-label="Open tyran's panel only" aria-expanded="false" aria-controls="access-content"><span class="rainbow" aria-hidden="true">↖</span></button>
+    <button class="edge-toggle" id="access-toggle" type="button"
+      aria-label="Open tyran's panel only" aria-expanded="false" aria-controls="access-content">
+      <span class="rainbow" aria-hidden="true">↖</span>
+    </button>
     <div class="access-content" id="access-content" aria-hidden="true">
       <h2 class="panel-heading">tyran's panel only</h2>
+
       <div class="password-box" id="password-box">
         <input id="password-display" type="password" aria-label="Four-digit password" placeholder="Enter 4-digit code" readonly inputmode="numeric" autocomplete="off" maxlength="4">
         <div class="keypad" id="keypad" aria-label="Numeric keypad"></div>
-        <div class="password-actions"><button class="clear-key" id="password-clear" type="button">Clear</button><button id="password-submit" type="button">Enter</button></div>
+        <div class="password-actions">
+          <button class="clear-key" id="password-clear" type="button">Clear</button>
+          <button id="password-submit" type="button">Enter</button>
+        </div>
         <p id="password-error" aria-live="polite"></p>
       </div>
+
       <div id="private-tools">
-        <div class="bubble auto-row"><p>Autoclicker<small>Use only if needed</small></p><button class="toggle-button" id="clicker-toggle" type="button" aria-pressed="false">Off</button></div>
+        <div class="bubble auto-row">
+          <p>Autoclicker<small>Use only if needed</small></p>
+          <button class="toggle-button" id="clicker-toggle" type="button" aria-pressed="false">Off</button>
+        </div>
         <button class="bonus-button" type="button" data-add="1000">Add 1,000 Clicks</button>
         <button class="bonus-button" type="button" data-add="10000">Add 10,000 Clicks</button>
         <button class="bonus-button" type="button" data-add="100000">Add 100,000 Clicks</button>
@@ -116,8 +459,17 @@
     const SAVE_KEY = 'click-counter-save';
     const BASE_TOKEN_ODDS = 137500;
     const PASSWORD = '3516';
-    let clicks = 0, rebirths = 0, pirateTokens = 0, autoRebirth = false, autoclicker = false;
-    let autoclickerTimer = null, phase = 'rolling', countdown = 10, phaseTimer = null, previousFactIndex = -1;
+
+    let clicks = 0;
+    let rebirths = 0;
+    let pirateTokens = 0;
+    let autoRebirth = false;
+    let autoclicker = false;
+    let autoclickerTimer = null;
+    let phase = 'rolling';
+    let countdown = 10;
+    let phaseTimer = null;
+    let previousFactIndex = -1;
 
     try {
       const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
@@ -125,14 +477,21 @@
       if (saved && Number.isSafeInteger(saved.rebirths) && saved.rebirths >= 0) rebirths = saved.rebirths;
       if (saved && Number.isSafeInteger(saved.pirateTokens) && saved.pirateTokens >= 0) pirateTokens = saved.pirateTokens;
       if (saved && typeof saved.autoRebirth === 'boolean') autoRebirth = saved.autoRebirth;
-    } catch (error) { console.warn('Could not load saved progress.', error); }
+    } catch (error) {
+      console.warn('Could not load saved progress.', error);
+    }
 
     const $ = (selector) => document.querySelector(selector);
     const tokenOdds = () => Math.max(1, BASE_TOKEN_ODDS - rebirths * 1001);
 
     function saveGame() {
-      try { localStorage.setItem(SAVE_KEY, JSON.stringify({ clicks, rebirths, pirateTokens, autoRebirth })); }
-      catch (error) { console.warn('Could not save progress.', error); }
+      try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify({
+          clicks, rebirths, pirateTokens, autoRebirth
+        }));
+      } catch (error) {
+        console.warn('Could not save progress.', error);
+      }
     }
 
     function updateUI() {
@@ -150,80 +509,136 @@
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) return;
-        const context = new AudioContext(), now = context.currentTime;
+
+        const context = new AudioContext();
+        const now = context.currentTime;
         const patterns = [
-          [[110,0,.18,'sawtooth'],[55,.08,.28,'sawtooth']],
-          [[660,0,.09,'square'],[880,.1,.1,'square'],[1320,.21,.18,'triangle']],
-          [[440,0,.12,'triangle'],[330,.13,.12,'triangle'],[220,.26,.25,'sine']],
-          [[880,0,.07,'sine'],[660,.08,.07,'sine'],[990,.17,.22,'square']]
+          [[110, 0, .18, 'sawtooth'], [55, .08, .28, 'sawtooth']],
+          [[660, 0, .09, 'square'], [880, .1, .1, 'square'], [1320, .21, .18, 'triangle']],
+          [[440, 0, .12, 'triangle'], [330, .13, .12, 'triangle'], [220, .26, .25, 'sine']],
+          [[880, 0, .07, 'sine'], [660, .08, .07, 'sine'], [990, .17, .22, 'square']]
         ];
-        patterns[Math.floor(Math.random()*patterns.length)].forEach(([frequency,offset,duration,type]) => {
-          const oscillator = context.createOscillator(), gain = context.createGain();
+
+        const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+        for (const [frequency, offset, duration, type] of pattern) {
+          const oscillator = context.createOscillator();
+          const gain = context.createGain();
           oscillator.type = type;
           oscillator.frequency.setValueAtTime(frequency, now + offset);
           gain.gain.setValueAtTime(.0001, now + offset);
           gain.gain.exponentialRampToValueAtTime(.12, now + offset + .015);
           gain.gain.exponentialRampToValueAtTime(.0001, now + offset + duration);
-          oscillator.connect(gain); gain.connect(context.destination);
-          oscillator.start(now + offset); oscillator.stop(now + offset + duration + .02);
-        });
+          oscillator.connect(gain);
+          gain.connect(context.destination);
+          oscillator.start(now + offset);
+          oscillator.stop(now + offset + duration + .02);
+        }
         setTimeout(() => context.close(), 900);
-      } catch (error) { /* Audio is optional. */ }
+      } catch (error) {
+        // Audio is optional.
+      }
     }
 
     function awardClicks(amount) {
       if (phase !== 'rolling') return;
+
       clicks = Math.min(Number.MAX_SAFE_INTEGER, clicks + amount);
+
       if (autoRebirth) {
         const earned = Math.floor(clicks / 100);
-        if (earned > 0) { clicks %= 100; rebirths += earned; }
+        if (earned > 0) {
+          clicks %= 100;
+          rebirths += earned;
+        }
       }
+
       updateUI();
       saveGame();
-      // Any click source can trigger this event, including bonus buttons and the autoclicker.
-      if (!autoRebirth && clicks > 1000000) startCelebration('Click limit exceeded! Shutdown sequence starting.', false);
+
+      if (!autoRebirth && clicks > 1000000) {
+        startCelebration('Click limit exceeded! Shutdown sequence starting.', false);
+      }
     }
 
     function setDrawer(drawerSelector, buttonSelector, contentSelector, openLabel, closeLabel) {
-      const drawer = $(drawerSelector), button = $(buttonSelector), content = $(contentSelector);
-      const open = drawer.classList.toggle('open');
-      button.setAttribute('aria-expanded', String(open));
-      button.setAttribute('aria-label', open ? closeLabel : openLabel);
-      content.setAttribute('aria-hidden', String(!open));
-      if (buttonSelector === '#rebirth-toggle') button.textContent = open ? '‹' : '›';
+      const drawer = $(drawerSelector);
+      const button = $(buttonSelector);
+      const content = $(contentSelector);
+      const isOpen = drawer.classList.toggle('open');
+
+      button.setAttribute('aria-expanded', String(isOpen));
+      button.setAttribute('aria-label', isOpen ? closeLabel : openLabel);
+      content.setAttribute('aria-hidden', String(!isOpen));
+
+      if (buttonSelector === '#rebirth-toggle') button.textContent = isOpen ? '‹' : '›';
     }
-    $('#rebirth-toggle').addEventListener('click', () => setDrawer('#rebirth-drawer','#rebirth-toggle','#rebirth-content','Open rebirth panel','Close rebirth panel'));
-    $('#access-toggle').addEventListener('click', () => setDrawer('#access-drawer','#access-toggle','#access-content',"Open tyran's panel only","Close tyran's panel only"));
-    $('#action-button').addEventListener('click', () => { playRandomClickSound(); awardClicks(1); });
+
+    $('#rebirth-toggle').addEventListener('click', () => {
+      setDrawer('#rebirth-drawer', '#rebirth-toggle', '#rebirth-content',
+        'Open rebirth panel', 'Close rebirth panel');
+    });
+
+    $('#access-toggle').addEventListener('click', () => {
+      setDrawer('#access-drawer', '#access-toggle', '#access-content',
+        "Open tyran's panel only", "Close tyran's panel only");
+    });
+
+    $('#action-button').addEventListener('click', () => {
+      playRandomClickSound();
+      awardClicks(1);
+    });
 
     $('#rebirth-auto').addEventListener('click', () => {
       autoRebirth = !autoRebirth;
-      if (autoRebirth) { const earned = Math.floor(clicks / 100); clicks %= 100; rebirths += earned; }
-      updateUI(); saveGame();
+      if (autoRebirth) {
+        const earned = Math.floor(clicks / 100);
+        clicks %= 100;
+        rebirths += earned;
+      }
+      updateUI();
+      saveGame();
     });
 
     function restartAutoclicker() {
       if (autoclickerTimer !== null) clearInterval(autoclickerTimer);
       autoclickerTimer = autoclicker ? setInterval(() => awardClicks(1), 100) : null;
     }
-    $('#clicker-toggle').addEventListener('click', () => { autoclicker = !autoclicker; restartAutoclicker(); updateUI(); saveGame(); });
-    document.querySelectorAll('.bonus-button').forEach(button => button.addEventListener('click', () => awardClicks(Number(button.dataset.add))));
 
-    // Numeric phone-style keypad for the four-digit panel code.
-    ['1','2','3','4','5','6','7','8','9','⌫','0','↵'].forEach(value => {
+    $('#clicker-toggle').addEventListener('click', () => {
+      autoclicker = !autoclicker;
+      restartAutoclicker();
+      updateUI();
+      saveGame();
+    });
+
+    document.querySelectorAll('.bonus-button').forEach((button) => {
+      button.addEventListener('click', () => awardClicks(Number(button.dataset.add)));
+    });
+
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '↵'].forEach((value) => {
       const key = document.createElement('button');
-      key.type = 'button'; key.textContent = value;
+      key.type = 'button';
+      key.textContent = value;
       key.setAttribute('aria-label', value === '⌫' ? 'Backspace' : value === '↵' ? 'Enter code' : value);
       key.addEventListener('click', () => {
         const input = $('#password-display');
-        if (value === '⌫') input.value = input.value.slice(0, -1);
-        else if (value === '↵') $('#password-submit').click();
-        else if (input.value.length < 4) input.value += value;
+        if (value === '⌫') {
+          input.value = input.value.slice(0, -1);
+        } else if (value === '↵') {
+          $('#password-submit').click();
+        } else if (input.value.length < 4) {
+          input.value += value;
+        }
         $('#password-error').textContent = '';
       });
       $('#keypad').append(key);
     });
-    $('#password-clear').addEventListener('click', () => { $('#password-display').value = ''; $('#password-error').textContent = ''; });
+
+    $('#password-clear').addEventListener('click', () => {
+      $('#password-display').value = '';
+      $('#password-error').textContent = '';
+    });
+
     $('#password-submit').addEventListener('click', () => {
       if ($('#password-display').value === PASSWORD) {
         $('#password-box').style.display = 'none';
@@ -237,8 +652,13 @@
 
     $('#reset-progress').addEventListener('click', () => {
       if (!confirm('Reset clicks and rebirths? Permanent Pirate Shop Tokens will be kept.')) return;
-      clicks = 0; rebirths = 0; autoRebirth = false; autoclicker = false;
-      restartAutoclicker(); updateUI(); saveGame();
+      clicks = 0;
+      rebirths = 0;
+      autoRebirth = false;
+      autoclicker = false;
+      restartAutoclicker();
+      updateUI();
+      saveGame();
     });
 
     const facts = [
@@ -253,82 +673,174 @@
       'The Eiffel Tower can grow taller in hot weather as its metal expands.',
       'Some turtles can breathe through specialized tissues in their rear ends.'
     ];
+
     function showRandomFact() {
       if (phase !== 'rolling') return;
+
       const existing = document.querySelectorAll('.fact-popup');
       if (existing.length >= 3) existing[0].remove();
-      const popup = document.createElement('section'); popup.className = 'fact-popup collapsible'; popup.setAttribute('aria-label',"Tyran's ad: random fun fact");
-      const bar = document.createElement('div'); bar.className = 'fact-bar';
-      const tab = document.createElement('span'); tab.className = 'fact-tab'; tab.textContent = "tyran's ad";
-      const close = document.createElement('button'); close.type = 'button'; close.className = 'fact-close'; close.textContent = '×'; close.setAttribute('aria-label','Close popup'); close.addEventListener('click', () => popup.remove());
-      bar.append(tab,close);
-      const body = document.createElement('div'); body.className = 'fact-body';
+
+      const popup = document.createElement('section');
+      popup.className = 'fact-popup collapsible';
+      popup.setAttribute('aria-label', "Tyran's ad: random fun fact");
+
+      const bar = document.createElement('div');
+      bar.className = 'fact-bar';
+
+      const tab = document.createElement('span');
+      tab.className = 'fact-tab';
+      tab.textContent = "tyran's ad";
+
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'fact-close';
+      close.textContent = '×';
+      close.setAttribute('aria-label', 'Close popup');
+      close.addEventListener('click', () => popup.remove());
+
+      bar.append(tab, close);
+
+      const body = document.createElement('div');
+      body.className = 'fact-body';
       const paragraph = document.createElement('p');
-      let index = Math.floor(Math.random()*facts.length); if (index === previousFactIndex) index = (index+1)%facts.length;
-      previousFactIndex = index; paragraph.textContent = facts[index]; body.append(paragraph); popup.append(bar,body); document.body.append(popup);
-      const margin=8, maxLeft=Math.max(margin,innerWidth-popup.offsetWidth-margin), maxTop=Math.max(margin,innerHeight-popup.offsetHeight-margin);
-      popup.style.left=`${margin+Math.random()*(maxLeft-margin)}px`; popup.style.top=`${margin+Math.random()*(maxTop-margin)}px`;
-      let drag=null;
-      bar.addEventListener('pointerdown', event => { if(event.target===close)return; const rect=popup.getBoundingClientRect(); drag={x:event.clientX-rect.left,y:event.clientY-rect.top}; bar.setPointerCapture(event.pointerId); });
-      bar.addEventListener('pointermove', event => { if(!drag)return; popup.style.left=`${Math.max(0,Math.min(innerWidth-popup.offsetWidth,event.clientX-drag.x))}px`; popup.style.top=`${Math.max(0,Math.min(innerHeight-popup.offsetHeight,event.clientY-drag.y))}px`; });
-      bar.addEventListener('pointerup',()=>drag=null); bar.addEventListener('pointercancel',()=>drag=null);
+
+      let index = Math.floor(Math.random() * facts.length);
+      if (index === previousFactIndex) index = (index + 1) % facts.length;
+      previousFactIndex = index;
+      paragraph.textContent = facts[index];
+
+      body.append(paragraph);
+      popup.append(bar, body);
+      document.body.append(popup);
+
+      const margin = 8;
+      const maxLeft = Math.max(margin, innerWidth - popup.offsetWidth - margin);
+      const maxTop = Math.max(margin, innerHeight - popup.offsetHeight - margin);
+      popup.style.left = `${margin + Math.random() * (maxLeft - margin)}px`;
+      popup.style.top = `${margin + Math.random() * (maxTop - margin)}px`;
+
+      let drag = null;
+      bar.addEventListener('pointerdown', (event) => {
+        if (event.target === close) return;
+        const rect = popup.getBoundingClientRect();
+        drag = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+        bar.setPointerCapture(event.pointerId);
+      });
+
+      bar.addEventListener('pointermove', (event) => {
+        if (!drag) return;
+        popup.style.left = `${Math.max(0, Math.min(innerWidth - popup.offsetWidth, event.clientX - drag.x))}px`;
+        popup.style.top = `${Math.max(0, Math.min(innerHeight - popup.offsetHeight, event.clientY - drag.y))}px`;
+      });
+
+      bar.addEventListener('pointerup', () => { drag = null; });
+      bar.addEventListener('pointercancel', () => { drag = null; });
     }
 
     function startCelebration(message, awardToken) {
       if (phase !== 'rolling') return;
+
       phase = 'celebration';
-      if (awardToken) { pirateTokens += 1; updateUI(); saveGame(); }
+      if (awardToken) {
+        pirateTokens += 1;
+        updateUI();
+        saveGame();
+      }
+
       document.body.classList.add('celebrating');
       let remaining = 10;
       $('#event-status').textContent = `${remaining} Seconds | ${message}`;
-      const layer = $('#celebration-layer'), colors = ['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#a855f7','#ec4899'];
+
+      const layer = $('#celebration-layer');
+      const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7', '#ec4899'];
+
       const confettiTimer = setInterval(() => {
-        for (let i=0;i<8;i++) {
-          const piece=document.createElement('i'); piece.className='confetti'; piece.style.left=`${Math.random()*100}vw`;
-          piece.style.background=colors[Math.floor(Math.random()*colors.length)]; piece.style.setProperty('--drift',`${(Math.random()-.5)*220}px`);
-          piece.style.animationDuration=`${2+Math.random()*2}s`; layer.append(piece); piece.addEventListener('animationend',()=>piece.remove());
+        for (let i = 0; i < 8; i++) {
+          const piece = document.createElement('i');
+          piece.className = 'confetti';
+          piece.style.left = `${Math.random() * 100}vw`;
+          piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+          piece.style.setProperty('--drift', `${(Math.random() - .5) * 220}px`);
+          piece.style.animationDuration = `${2 + Math.random() * 2}s`;
+          layer.append(piece);
+          piece.addEventListener('animationend', () => piece.remove());
         }
-      },120);
-      phaseTimer=setInterval(()=>{
-        remaining--; $('#event-status').textContent=`${remaining} Seconds | ${message}`;
-        if(remaining<=0){clearInterval(phaseTimer);clearInterval(confettiTimer);layer.replaceChildren();document.body.classList.remove('celebrating');startShutdown();}
-      },1000);
+      }, 120);
+
+      phaseTimer = setInterval(() => {
+        remaining -= 1;
+        $('#event-status').textContent = `${remaining} Seconds | ${message}`;
+        if (remaining <= 0) {
+          clearInterval(phaseTimer);
+          clearInterval(confettiTimer);
+          layer.replaceChildren();
+          document.body.classList.remove('celebrating');
+          startShutdown();
+        }
+      }, 1000);
     }
 
     function startShutdown() {
-      phase='shutdown'; let remaining=60; document.body.classList.add('shutdown');
-      $('#event-status').textContent=`${remaining} Seconds Until Shutdown`;
-      phaseTimer=setInterval(()=>{
-        remaining--; $('#event-status').textContent=`${remaining} Seconds Until Shutdown`;
-        if(remaining<=0){
-          clearInterval(phaseTimer); document.body.classList.remove('shutdown');
-          // Clear all temporary progress, but keep the permanent token total.
-          clicks=0; rebirths=0; autoRebirth=false; autoclicker=false; restartAutoclicker();
-          phase='rolling'; countdown=10; updateUI(); saveGame();
-          $('#restore-flash').classList.remove('flash'); void $('#restore-flash').offsetWidth; $('#restore-flash').classList.add('flash');
-          const label=`10 Seconds | Pirate Shop Token Chance: 1/${tokenOdds().toLocaleString()}`;
-          $('#timer-label').textContent=label; $('#event-status').textContent=label;
+      phase = 'shutdown';
+      let remaining = 60;
+      document.body.classList.add('shutdown');
+      $('#event-status').textContent = `${remaining} Seconds Until Shutdown`;
+
+      phaseTimer = setInterval(() => {
+        remaining -= 1;
+        $('#event-status').textContent = `${remaining} Seconds Until Shutdown`;
+
+        if (remaining <= 0) {
+          clearInterval(phaseTimer);
+          document.body.classList.remove('shutdown');
+
+          clicks = 0;
+          rebirths = 0;
+          autoRebirth = false;
+          autoclicker = false;
+          restartAutoclicker();
+          phase = 'rolling';
+          countdown = 10;
+          updateUI();
+          saveGame();
+
+          $('#restore-flash').classList.remove('flash');
+          void $('#restore-flash').offsetWidth;
+          $('#restore-flash').classList.add('flash');
+          const label = `10 Seconds | Pirate Shop Token Chance: 1/${tokenOdds().toLocaleString()}`;
+          $('#timer-label').textContent = label;
+          $('#event-status').textContent = label;
         }
-      },1000);
+      }, 1000);
     }
 
     function rollForToken() {
-      if(phase!=='rolling')return;
-      if(Math.random()<1/tokenOdds()) startCelebration('Pirate Shop Token found!',true);
-      else countdown=10;
+      if (phase !== 'rolling') return;
+
+      if (Math.random() < 1 / tokenOdds()) {
+        startCelebration('Pirate Shop Token found!', true);
+      } else {
+        countdown = 10;
+      }
     }
 
-    updateUI(); saveGame();
-    setInterval(()=>{
-      if(phase!=='rolling')return;
-      countdown--;
-      if(countdown<=0)rollForToken();
-      if(phase==='rolling'){
-        const label=`${countdown} Seconds | Pirate Shop Token Chance: 1/${tokenOdds().toLocaleString()}`;
-        $('#timer-label').textContent=label; $('#event-status').textContent=label;
+    updateUI();
+    saveGame();
+
+    setInterval(() => {
+      if (phase !== 'rolling') return;
+
+      countdown -= 1;
+      if (countdown <= 0) rollForToken();
+
+      if (phase === 'rolling') {
+        const label = `${countdown} Seconds | Pirate Shop Token Chance: 1/${tokenOdds().toLocaleString()}`;
+        $('#timer-label').textContent = label;
+        $('#event-status').textContent = label;
       }
-    },1000);
-    setInterval(showRandomFact,5000);
+    }, 1000);
+
+    setInterval(showRandomFact, 5000);
   </script>
 </body>
 </html>

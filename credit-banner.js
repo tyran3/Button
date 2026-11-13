@@ -24,7 +24,7 @@
 
   const credit = document.createElement('p');
   credit.id = 'credit-banner';
-  credit.textContent = 'Made By tyran, WAWA, cart';
+  credit.textContent = 'Made By tyran, WAWA, cart | Pirate Shop Token Animation Is Down! Sorry For The Inconvenience.';
   credit.setAttribute('aria-label', 'Made By tyran, WAWA, cart');
   button.before(credit);
 })();

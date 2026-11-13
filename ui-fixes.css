@@ -13,3 +13,99 @@
 #access-drawer #private-tools.unlocked{display:grid!important;gap:9px!important}
 #access-drawer .password-box{display:grid!important;gap:10px!important}
 @media(max-width:480px){#access-drawer{right:8px!important;bottom:8px!important;width:calc(100vw - 16px)!important}#access-drawer #access-toggle{right:12px!important;bottom:12px!important}#access-drawer.open #access-toggle{right:18px!important}}
+/* Rebirth drawer: slide in from the left. */
+#rebirth-drawer{
+  position:fixed!important;
+  top:50%!important;
+  right:auto!important;
+  bottom:auto!important;
+  left:0!important;
+  transform:translate(-100%,-50%)!important;
+}
+#rebirth-drawer.open{
+  transform:translate(0,-50%)!important;
+}
+
+/* Tyran drawer: keep the toggle visible; show the panel as a separate popup. */
+#access-drawer{
+  position:fixed!important;
+  top:auto!important;
+  right:0!important;
+  bottom:0!important;
+  left:auto!important;
+  width:0!important;
+  height:0!important;
+  max-height:none!important;
+  padding:0!important;
+  overflow:visible!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  transform:none!important;
+  visibility:visible!important;
+  pointer-events:none!important;
+  z-index:1000!important;
+}
+#access-drawer.open{
+  visibility:visible!important;
+  pointer-events:none!important;
+}
+
+#access-drawer #access-toggle{
+  position:fixed!important;
+  top:auto!important;
+  right:16px!important;
+  bottom:16px!important;
+  left:auto!important;
+  width:50px!important;
+  height:50px!important;
+  z-index:1002!important;
+  pointer-events:auto!important;
+  border:0!important;
+  border-radius:50%!important;
+  background:#18181b!important;
+  color:#fff!important;
+  box-shadow:0 8px 24px rgba(24,24,27,.3)!important;
+}
+
+#access-drawer .access-content{
+  position:fixed!important;
+  top:auto!important;
+  right:12px!important;
+  bottom:76px!important;
+  left:auto!important;
+  display:none!important;
+  width:min(380px,calc(100vw - 24px))!important;
+  max-height:min(78vh,620px)!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  padding:16px!important;
+  border:1px solid #e4e4e7!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  box-shadow:0 12px 35px rgba(24,24,27,.2)!important;
+  pointer-events:auto!important;
+  z-index:1001!important;
+}
+#access-drawer.open .access-content{
+  display:grid!important;
+  gap:10px!important;
+}
+
+#access-drawer #private-tools{
+  display:none!important;
+}
+#access-drawer #private-tools.unlocked{
+  display:grid!important;
+  gap:9px!important;
+}
+
+@media(max-width:480px){
+  #access-drawer #access-toggle{right:12px!important;bottom:12px!important}
+  #access-drawer .access-content{
+    right:8px!important;
+    bottom:68px!important;
+    width:calc(100vw - 16px)!important;
+    max-height:75vh!important;
+  }
+}

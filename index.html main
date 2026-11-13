@@ -8,6 +8,11 @@
   <style>
     * { box-sizing: border-box; }
 
+    html, body {
+      margin: 0;
+      min-height: 100vh;
+    }
+
     body {
       min-height: 100vh;
       margin: 0;
@@ -340,6 +345,99 @@
       pointer-events: none;
     }
 
+    body.shutdown-chaos {
+      filter: contrast(1.35) saturate(1.5) hue-rotate(18deg);
+      animation: ui-jitter .16s steps(2, end) infinite;
+      transition: none;
+    }
+
+    @keyframes ui-jitter {
+      0% { transform: translate(1px, -1px) rotate(.12deg); }
+      50% { transform: translate(-1px, 1px) rotate(-.12deg); }
+      100% { transform: translate(1px, -1px) rotate(.12deg); }
+    }
+
+    .shutdown-overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 220;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .2s ease;
+      background: rgba(5, 10, 20, .28);
+    }
+
+    .shutdown-overlay.visible {
+      opacity: 1;
+    }
+
+    .shutdown-overlay span {
+      display: block;
+      font-weight: 1000;
+      font-size: clamp(4rem, 18vw, 12rem);
+      line-height: 1;
+      letter-spacing: .08em;
+      color: #fff;
+      text-shadow: 0 8px 30px rgba(0,0,0,.7), 0 0 30px rgba(255,90,90,.5);
+      animation:
+        shutdown-pulse .8s steps(2, end) infinite,
+        shutdown-glitch .12s steps(2, end) infinite;
+    }
+
+    @keyframes shutdown-pulse {
+      50% { opacity: .45; transform: scale(.94); }
+    }
+
+    @keyframes shutdown-glitch {
+      0% { transform: translate(3px, -2px) skewX(8deg); }
+      50% { transform: translate(-4px, 2px) skewX(-8deg); color: #ffd4d4; }
+      100% { transform: translate(3px, -2px) skewX(8deg); }
+    }
+
+    .reconstruct-overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 230;
+      pointer-events: none;
+      opacity: 0;
+      background: rgba(22, 163, 74, .2);
+      color: #fff;
+      text-shadow: 0 6px 20px rgba(0,0,0,.6);
+      transition: opacity .2s ease;
+    }
+
+    .reconstruct-overlay.visible {
+      opacity: 1;
+      animation: reconstruct-flash .45s steps(2, end) infinite;
+    }
+
+    @keyframes reconstruct-flash {
+      0%, 100% { background: rgba(22, 163, 74, .16); }
+      50% { background: rgba(34, 197, 94, .72); }
+    }
+
+    .reconstruct-overlay span {
+      display: block;
+      font-size: clamp(2.5rem, 9vw, 7rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: .04em;
+    }
+
+    body.reconstructing {
+      animation: reconstruct-jitter .2s steps(2, end) infinite;
+    }
+
+    @keyframes reconstruct-jitter {
+      0% { filter: brightness(1.12) hue-rotate(-8deg); }
+      50% { filter: brightness(.94) hue-rotate(8deg); }
+      100% { filter: brightness(1.12) hue-rotate(-8deg); }
+    }
+
     #event-status {
       position: fixed;
       z-index: 10;
@@ -381,466 +479,5 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        transition-duration: .01ms !important;
-        animation-duration: .01ms !important;
-      }
-    }
-  </style>
-</head>
-<body>
-  <button class="collapsible" id="reset-progress" type="button">RESET ALL PROGRESS</button>
-
-  <main class="collapsible">
-    <p id="count" aria-live="polite">Clicks: 0</p>
-    <button id="action-button" type="button" aria-label="Click the F emblem">
-      <img src="f-button.svg" alt="Golden F compass emblem">
-    </button>
-    <p id="timer-label" aria-live="polite">10 Seconds | Pirate Shop Token Chance: 1/137,500</p>
-  </main>
-
-  <aside class="drawer collapsible" id="rebirth-drawer" aria-label="Rebirth settings">
-    <button class="edge-toggle" id="rebirth-toggle" type="button"
-      aria-label="Open rebirth panel" aria-expanded="false" aria-controls="rebirth-content">›</button>
-    <div class="rebirth-list" id="rebirth-content" aria-hidden="true">
-      <div class="bubble">
-        <p>Rebirth</p>
-        <small id="rebirth-count">Rebirths: 0</small>
-      </div>
-      <div class="bubble">
-        <p>Pirate Shop Token Chance</p>
-        <small id="chance-display">1/137,500</small>
-      </div>
-      <div class="bubble">
-        <p>Pirate Shop Tokens | PERMANENT: <span id="token-count">0</span></p>
-      </div>
-      <div class="bubble auto-row">
-        <p>Auto rebirth<small>Rebirth every 100 clicks</small></p>
-        <button class="toggle-button" id="rebirth-auto" type="button" aria-pressed="false">Auto Off</button>
-      </div>
-    </div>
-  </aside>
-
-  <aside class="drawer collapsible" id="access-drawer" aria-label="Tyran's panel only">
-    <button class="edge-toggle" id="access-toggle" type="button"
-      aria-label="Open tyran's panel only" aria-expanded="false" aria-controls="access-content">
-      <span class="rainbow" aria-hidden="true">↖</span>
-    </button>
-    <div class="access-content" id="access-content" aria-hidden="true">
-      <h2 class="panel-heading">tyran's panel only</h2>
-
-      <div class="password-box" id="password-box">
-        <input id="password-display" type="password" aria-label="Four-digit password" placeholder="Enter 4-digit code" readonly inputmode="numeric" autocomplete="off" maxlength="4">
-        <div class="keypad" id="keypad" aria-label="Numeric keypad"></div>
-        <div class="password-actions">
-          <button class="clear-key" id="password-clear" type="button">Clear</button>
-          <button id="password-submit" type="button">Enter</button>
-        </div>
-        <p id="password-error" aria-live="polite"></p>
-      </div>
-
-      <div id="private-tools">
-        <div class="bubble auto-row">
-          <p>Autoclicker<small>Use only if needed</small></p>
-          <button class="toggle-button" id="clicker-toggle" type="button" aria-pressed="false">Off</button>
-        </div>
-        <button class="bonus-button" type="button" data-add="1000">Add 1,000 Clicks</button>
-        <button class="bonus-button" type="button" data-add="10000">Add 10,000 Clicks</button>
-        <button class="bonus-button" type="button" data-add="100000">Add 100,000 Clicks</button>
-      </div>
-    </div>
-  </aside>
-
-  <div id="celebration-layer" aria-hidden="true"></div>
-  <p id="event-status" aria-live="polite">10 Seconds | Pirate Shop Token Chance: 1/137,500</p>
-  <div id="restore-flash" aria-hidden="true"></div>
-
-  <script>
-    const SAVE_KEY = 'click-counter-save';
-    const BASE_TOKEN_ODDS = 137500;
-    const PASSWORD = '3516';
-
-    let clicks = 0;
-    let rebirths = 0;
-    let pirateTokens = 0;
-    let autoRebirth = false;
-    let autoclicker = false;
-    let autoclickerTimer = null;
-    let phase = 'rolling';
-    let countdown = 10;
-    let phaseTimer = null;
-    let previousFactIndex = -1;
-
-    try {
-      const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
-      if (saved && Number.isSafeInteger(saved.clicks) && saved.clicks >= 0) clicks = saved.clicks;
-      if (saved && Number.isSafeInteger(saved.rebirths) && saved.rebirths >= 0) rebirths = saved.rebirths;
-      if (saved && Number.isSafeInteger(saved.pirateTokens) && saved.pirateTokens >= 0) pirateTokens = saved.pirateTokens;
-      if (saved && typeof saved.autoRebirth === 'boolean') autoRebirth = saved.autoRebirth;
-    } catch (error) {
-      console.warn('Could not load saved progress.', error);
-    }
-
-    const $ = (selector) => document.querySelector(selector);
-    const tokenOdds = () => Math.max(1, BASE_TOKEN_ODDS - rebirths * 1001);
-
-    function saveGame() {
-      try {
-        localStorage.setItem(SAVE_KEY, JSON.stringify({
-          clicks, rebirths, pirateTokens, autoRebirth
-        }));
-      } catch (error) {
-        console.warn('Could not save progress.', error);
-      }
-    }
-
-    function updateUI() {
-      $('#count').textContent = `Clicks: ${clicks.toLocaleString()}`;
-      $('#rebirth-count').textContent = `Rebirths: ${rebirths.toLocaleString()}`;
-      $('#token-count').textContent = pirateTokens.toLocaleString();
-      $('#chance-display').textContent = `1/${tokenOdds().toLocaleString()}`;
-      $('#rebirth-auto').setAttribute('aria-pressed', String(autoRebirth));
-      $('#rebirth-auto').textContent = autoRebirth ? 'Auto On' : 'Auto Off';
-      $('#clicker-toggle').setAttribute('aria-pressed', String(autoclicker));
-      $('#clicker-toggle').textContent = autoclicker ? 'On' : 'Off';
-    }
-
-    function playRandomClickSound() {
-      try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-
-        const context = new AudioContext();
-        const now = context.currentTime;
-        const patterns = [
-          [[110, 0, .18, 'sawtooth'], [55, .08, .28, 'sawtooth']],
-          [[660, 0, .09, 'square'], [880, .1, .1, 'square'], [1320, .21, .18, 'triangle']],
-          [[440, 0, .12, 'triangle'], [330, .13, .12, 'triangle'], [220, .26, .25, 'sine']],
-          [[880, 0, .07, 'sine'], [660, .08, .07, 'sine'], [990, .17, .22, 'square']]
-        ];
-
-        const pattern = patterns[Math.floor(Math.random() * patterns.length)];
-        for (const [frequency, offset, duration, type] of pattern) {
-          const oscillator = context.createOscillator();
-          const gain = context.createGain();
-          oscillator.type = type;
-          oscillator.frequency.setValueAtTime(frequency, now + offset);
-          gain.gain.setValueAtTime(.0001, now + offset);
-          gain.gain.exponentialRampToValueAtTime(.12, now + offset + .015);
-          gain.gain.exponentialRampToValueAtTime(.0001, now + offset + duration);
-          oscillator.connect(gain);
-          gain.connect(context.destination);
-          oscillator.start(now + offset);
-          oscillator.stop(now + offset + duration + .02);
-        }
-        setTimeout(() => context.close(), 900);
-      } catch (error) {
-        // Audio is optional.
-      }
-    }
-
-    function awardClicks(amount) {
-      if (phase !== 'rolling') return;
-
-      clicks = Math.min(Number.MAX_SAFE_INTEGER, clicks + amount);
-
-      if (autoRebirth) {
-        const earned = Math.floor(clicks / 100);
-        if (earned > 0) {
-          clicks %= 100;
-          rebirths += earned;
-        }
-      }
-
-      updateUI();
-      saveGame();
-
-      if (!autoRebirth && clicks > 1000000) {
-        startCelebration('Click limit exceeded! Shutdown sequence starting.', false);
-      }
-    }
-
-    function setDrawer(drawerSelector, buttonSelector, contentSelector, openLabel, closeLabel) {
-      const drawer = $(drawerSelector);
-      const button = $(buttonSelector);
-      const content = $(contentSelector);
-      const isOpen = drawer.classList.toggle('open');
-
-      button.setAttribute('aria-expanded', String(isOpen));
-      button.setAttribute('aria-label', isOpen ? closeLabel : openLabel);
-      content.setAttribute('aria-hidden', String(!isOpen));
-
-      if (buttonSelector === '#rebirth-toggle') button.textContent = isOpen ? '‹' : '›';
-    }
-
-    $('#rebirth-toggle').addEventListener('click', () => {
-      setDrawer('#rebirth-drawer', '#rebirth-toggle', '#rebirth-content',
-        'Open rebirth panel', 'Close rebirth panel');
-    });
-
-    $('#access-toggle').addEventListener('click', () => {
-      setDrawer('#access-drawer', '#access-toggle', '#access-content',
-        "Open tyran's panel only", "Close tyran's panel only");
-    });
-
-    $('#action-button').addEventListener('click', () => {
-      playRandomClickSound();
-      awardClicks(1);
-    });
-
-    $('#rebirth-auto').addEventListener('click', () => {
-      autoRebirth = !autoRebirth;
-      if (autoRebirth) {
-        const earned = Math.floor(clicks / 100);
-        clicks %= 100;
-        rebirths += earned;
-      }
-      updateUI();
-      saveGame();
-    });
-
-    function restartAutoclicker() {
-      if (autoclickerTimer !== null) clearInterval(autoclickerTimer);
-      autoclickerTimer = autoclicker ? setInterval(() => awardClicks(1), 100) : null;
-    }
-
-    $('#clicker-toggle').addEventListener('click', () => {
-      autoclicker = !autoclicker;
-      restartAutoclicker();
-      updateUI();
-      saveGame();
-    });
-
-    document.querySelectorAll('.bonus-button').forEach((button) => {
-      button.addEventListener('click', () => awardClicks(Number(button.dataset.add)));
-    });
-
-    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '↵'].forEach((value) => {
-      const key = document.createElement('button');
-      key.type = 'button';
-      key.textContent = value;
-      key.setAttribute('aria-label', value === '⌫' ? 'Backspace' : value === '↵' ? 'Enter code' : value);
-      key.addEventListener('click', () => {
-        const input = $('#password-display');
-        if (value === '⌫') {
-          input.value = input.value.slice(0, -1);
-        } else if (value === '↵') {
-          $('#password-submit').click();
-        } else if (input.value.length < 4) {
-          input.value += value;
-        }
-        $('#password-error').textContent = '';
-      });
-      $('#keypad').append(key);
-    });
-
-    $('#password-clear').addEventListener('click', () => {
-      $('#password-display').value = '';
-      $('#password-error').textContent = '';
-    });
-
-    $('#password-submit').addEventListener('click', () => {
-      if ($('#password-display').value === PASSWORD) {
-        $('#password-box').style.display = 'none';
-        $('#private-tools').classList.add('unlocked');
-        $('#password-error').textContent = '';
-      } else {
-        $('#password-display').value = '';
-        $('#password-error').textContent = 'Incorrect code. Enter the four-digit code again.';
-      }
-    });
-
-    $('#reset-progress').addEventListener('click', () => {
-      if (!confirm('Reset clicks and rebirths? Permanent Pirate Shop Tokens will be kept.')) return;
-      clicks = 0;
-      rebirths = 0;
-      autoRebirth = false;
-      autoclicker = false;
-      restartAutoclicker();
-      updateUI();
-      saveGame();
-    });
-
-    const facts = [
-      'Octopuses have three hearts, and two stop beating while they swim.',
-      'A group of flamingos is called a flamboyance.',
-      'Bananas are berries, but strawberries are not.',
-      'The Moon moves away from Earth by about 3.8 centimeters each year.',
-      'Wombat poop is cube-shaped.',
-      'A day on Venus is longer than its year.',
-      'Honey can remain edible for thousands of years when sealed well.',
-      'Sea otters sometimes hold hands while they sleep so they do not drift apart.',
-      'The Eiffel Tower can grow taller in hot weather as its metal expands.',
-      'Some turtles can breathe through specialized tissues in their rear ends.'
-    ];
-
-    function showRandomFact() {
-      if (phase !== 'rolling') return;
-
-      const existing = document.querySelectorAll('.fact-popup');
-      if (existing.length >= 3) existing[0].remove();
-
-      const popup = document.createElement('section');
-      popup.className = 'fact-popup collapsible';
-      popup.setAttribute('aria-label', "Tyran's ad: random fun fact");
-
-      const bar = document.createElement('div');
-      bar.className = 'fact-bar';
-
-      const tab = document.createElement('span');
-      tab.className = 'fact-tab';
-      tab.textContent = "tyran's ad";
-
-      const close = document.createElement('button');
-      close.type = 'button';
-      close.className = 'fact-close';
-      close.textContent = '×';
-      close.setAttribute('aria-label', 'Close popup');
-      close.addEventListener('click', () => popup.remove());
-
-      bar.append(tab, close);
-
-      const body = document.createElement('div');
-      body.className = 'fact-body';
-      const paragraph = document.createElement('p');
-
-      let index = Math.floor(Math.random() * facts.length);
-      if (index === previousFactIndex) index = (index + 1) % facts.length;
-      previousFactIndex = index;
-      paragraph.textContent = facts[index];
-
-      body.append(paragraph);
-      popup.append(bar, body);
-      document.body.append(popup);
-
-      const margin = 8;
-      const maxLeft = Math.max(margin, innerWidth - popup.offsetWidth - margin);
-      const maxTop = Math.max(margin, innerHeight - popup.offsetHeight - margin);
-      popup.style.left = `${margin + Math.random() * (maxLeft - margin)}px`;
-      popup.style.top = `${margin + Math.random() * (maxTop - margin)}px`;
-
-      let drag = null;
-      bar.addEventListener('pointerdown', (event) => {
-        if (event.target === close) return;
-        const rect = popup.getBoundingClientRect();
-        drag = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-        bar.setPointerCapture(event.pointerId);
-      });
-
-      bar.addEventListener('pointermove', (event) => {
-        if (!drag) return;
-        popup.style.left = `${Math.max(0, Math.min(innerWidth - popup.offsetWidth, event.clientX - drag.x))}px`;
-        popup.style.top = `${Math.max(0, Math.min(innerHeight - popup.offsetHeight, event.clientY - drag.y))}px`;
-      });
-
-      bar.addEventListener('pointerup', () => { drag = null; });
-      bar.addEventListener('pointercancel', () => { drag = null; });
-    }
-
-    function startCelebration(message, awardToken) {
-      if (phase !== 'rolling') return;
-
-      phase = 'celebration';
-      if (awardToken) {
-        pirateTokens += 1;
-        updateUI();
-        saveGame();
-      }
-
-      document.body.classList.add('celebrating');
-      let remaining = 10;
-      $('#event-status').textContent = `${remaining} Seconds | ${message}`;
-
-      const layer = $('#celebration-layer');
-      const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7', '#ec4899'];
-
-      const confettiTimer = setInterval(() => {
-        for (let i = 0; i < 8; i++) {
-          const piece = document.createElement('i');
-          piece.className = 'confetti';
-          piece.style.left = `${Math.random() * 100}vw`;
-          piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-          piece.style.setProperty('--drift', `${(Math.random() - .5) * 220}px`);
-          piece.style.animationDuration = `${2 + Math.random() * 2}s`;
-          layer.append(piece);
-          piece.addEventListener('animationend', () => piece.remove());
-        }
-      }, 120);
-
-      phaseTimer = setInterval(() => {
-        remaining -= 1;
-        $('#event-status').textContent = `${remaining} Seconds | ${message}`;
-        if (remaining <= 0) {
-          clearInterval(phaseTimer);
-          clearInterval(confettiTimer);
-          layer.replaceChildren();
-          document.body.classList.remove('celebrating');
-          startShutdown();
-        }
-      }, 1000);
-    }
-
-    function startShutdown() {
-      phase = 'shutdown';
-      let remaining = 60;
-      document.body.classList.add('shutdown');
-      $('#event-status').textContent = `${remaining} Seconds Until Shutdown`;
-
-      phaseTimer = setInterval(() => {
-        remaining -= 1;
-        $('#event-status').textContent = `${remaining} Seconds Until Shutdown`;
-
-        if (remaining <= 0) {
-          clearInterval(phaseTimer);
-          document.body.classList.remove('shutdown');
-
-          clicks = 0;
-          rebirths = 0;
-          autoRebirth = false;
-          autoclicker = false;
-          restartAutoclicker();
-          phase = 'rolling';
-          countdown = 10;
-          updateUI();
-          saveGame();
-
-          $('#restore-flash').classList.remove('flash');
-          void $('#restore-flash').offsetWidth;
-          $('#restore-flash').classList.add('flash');
-          const label = `10 Seconds | Pirate Shop Token Chance: 1/${tokenOdds().toLocaleString()}`;
-          $('#timer-label').textContent = label;
-          $('#event-status').textContent = label;
-        }
-      }, 1000);
-    }
-
-    function rollForToken() {
-      if (phase !== 'rolling') return;
-
-      if (Math.random() < 1 / tokenOdds()) {
-        startCelebration('Pirate Shop Token found!', true);
-      } else {
-        countdown = 10;
-      }
-    }
-
-    updateUI();
-    saveGame();
-
-    setInterval(() => {
-      if (phase !== 'rolling') return;
-
-      countdown -= 1;
-      if (countdown <= 0) rollForToken();
-
-      if (phase === 'rolling') {
-        const label = `${countdown} Seconds | Pirate Shop Token Chance: 1/${tokenOdds().toLocaleString()}`;
-        $('#timer-label').textContent = label;
-        $('#event-status').textContent = label;
-      }
-    }, 1000);
-
-    setInterval(showRandomFact, 5000);
-  </script>
-</body>
-</html>
+      *, *::before, *::after {*
+

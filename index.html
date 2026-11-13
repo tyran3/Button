@@ -10,7 +10,7 @@
     .shutdown-message-layer,.reconstruct-message-layer{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none}
     .shutdown-message-layer{z-index:210;background:transparent;color:#fff;text-shadow:0 4px 18px #600;font-size:clamp(4rem,18vw,12rem);font-weight:1000;letter-spacing:.08em}
     .shutdown-message-layer span{animation:shutdown-text-pulse .8s steps(2,end) infinite}
-    .reconstruct-message-layer{z-index:220;background:rgba(22,163,74,.25);color:#fff;text-shadow:0 4px 18px #064e3b;font-size:clamp(2.4rem,10vw,7rem);font-weight:900;letter-spacing:.04em;animation:green-flash .42s steps(2,end) infinite}
+    .reconstruct-message-layer{z-index:220;background:rgba(22,163,74,.25);color:#fff;text-shadow:0 4px 18px #064e3b;font-size:clamp(2.4rem,10vw,7rem);font-weight:900;letter-spacing:.04em;animation:reconstruct-jitter .2s steps(2,end) infinite}
     body .collapsible{transition:transform .28s ease,opacity .28s ease,filter .28s ease,scale .28s ease!important}
     body.shutdown-chaos{filter:contrast(1.35) saturate(1.5) hue-rotate(25deg);animation:ui-jitter .17s steps(2,end) infinite}
     body.shutdown-chaos #event-status{transform:translateX(5px) skewX(-5deg);filter:blur(.6px)}
@@ -36,6 +36,10 @@
         document.open();
         document.write(html);
         document.close();
+        const uiStyles = document.createElement('link');
+        uiStyles.rel = 'stylesheet';
+        uiStyles.href = new URL('ui-restore.css', window.location.href).href;
+        document.head.appendChild(uiStyles);
         const effects = document.createElement('script');
         effects.src = new URL('shutdown-effects.js', window.location.href).href;
         effects.onerror = () => console.error('Could not load shutdown effects.');

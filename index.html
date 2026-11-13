@@ -6,10 +6,7 @@
   <link rel="icon" type="image/svg+xml" href="f-button.svg">
   <title>Click Counter</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       min-height: 100vh;
       margin: 0;
@@ -20,20 +17,13 @@
       color: #18181b;
       font-family: system-ui, sans-serif;
     }
-
     main {
       display: grid;
       justify-items: center;
       gap: 1rem;
       transform: translateY(-1.5rem);
     }
-
-    #count {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
-
+    #count { margin: 0; font-size: 1.25rem; font-weight: 600; }
     #action-button {
       width: min(60vw, 240px);
       aspect-ratio: 1;
@@ -44,49 +34,33 @@
       cursor: pointer;
       transition: transform 150ms ease;
     }
-
-    #action-button:hover {
-      transform: scale(1.05);
-    }
-
-    #action-button:active {
-      transform: scale(0.97);
-    }
-
-    #action-button:focus-visible,
-    .drawer-toggle:focus-visible,
-    #auto-toggle:focus-visible {
+    #action-button:hover { transform: scale(1.05); }
+    #action-button:active { transform: scale(0.97); }
+    #action-button img { display: block; width: 100%; height: 100%; object-fit: contain; }
+    #action-button:focus-visible, .drawer-toggle:focus-visible, #auto-toggle:focus-visible,
+    .utility-toggle:focus-visible, .utility-button:focus-visible {
       outline: 3px solid #2563eb;
       outline-offset: 5px;
     }
 
-    #action-button img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    .side-drawer {
+    .side-drawer, .utility-drawer {
       position: fixed;
       z-index: 2;
-      top: 50%;
-      left: 0;
       width: min(340px, calc(100vw - 48px));
       padding: 24px;
       border: 1px solid #e4e4e7;
-      border-left: 0;
-      border-radius: 0 16px 16px 0;
       background: #fff;
       box-shadow: 0 12px 35px rgb(24 24 27 / 18%);
-      transform: translate(-100%, -50%);
       transition: transform 300ms cubic-bezier(.2, .8, .2, 1);
     }
-
-    .side-drawer.is-open {
-      transform: translate(0, -50%);
+    .side-drawer {
+      top: 50%;
+      left: 0;
+      border-left: 0;
+      border-radius: 0 16px 16px 0;
+      transform: translate(-100%, -50%);
     }
-
+    .side-drawer.is-open { transform: translate(0, -50%); }
     .drawer-toggle {
       position: absolute;
       top: 20px;
@@ -104,14 +78,7 @@
       cursor: pointer;
       box-shadow: 6px 6px 18px rgb(24 24 27 / 10%);
     }
-
-    .drawer-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
+    .drawer-content { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
     .rebirth-bubble {
       position: relative;
       min-width: 150px;
@@ -120,7 +87,6 @@
       border-radius: 16px;
       background: #f8fafc;
     }
-
     .rebirth-bubble::after {
       position: absolute;
       top: 20px;
@@ -133,19 +99,9 @@
       content: "";
       transform: rotate(45deg);
     }
-
-    .rebirth-title {
-      margin: 0 0 4px;
-      font-weight: 700;
-    }
-
-    #rebirth-count {
-      margin: 0;
-      color: #52525b;
-      font-size: 0.875rem;
-    }
-
-    #auto-toggle {
+    .rebirth-title { margin: 0 0 4px; font-weight: 700; }
+    #rebirth-count { margin: 0; color: #52525b; font-size: .875rem; }
+    #auto-toggle, .utility-button {
       min-width: 92px;
       padding: 12px 14px;
       border: 0;
@@ -157,20 +113,69 @@
       cursor: pointer;
       transition: background 150ms ease, transform 150ms ease;
     }
+    #auto-toggle:hover, .utility-button:hover { background: #b91c1c; transform: translateY(-1px); }
+    #auto-toggle[aria-pressed="true"] { background: #16a34a; box-shadow: inset 0 0 0 2px rgb(255 255 255 / 35%); }
+    #auto-toggle[aria-pressed="true"]:hover { background: #15803d; }
 
-    #auto-toggle:hover {
-      background: #b91c1c;
-      transform: translateY(-1px);
+    .utility-drawer {
+      right: 0;
+      bottom: 0;
+      padding: 18px;
+      border-right: 0;
+      border-bottom: 0;
+      border-radius: 16px 0 0 0;
+      transform: translate(100%, 100%);
     }
-
-    #auto-toggle[aria-pressed="true"] {
-      background: #16a34a;
-      box-shadow: inset 0 0 0 2px rgb(255 255 255 / 35%);
+    .utility-drawer.is-open { transform: translate(0, 0); }
+    .utility-toggle {
+      position: absolute;
+      top: -50px;
+      left: -50px;
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #d4d4d8;
+      border-bottom: 0;
+      border-right: 0;
+      border-radius: 14px 0 0 0;
+      background: #fff;
+      font-size: 1.7rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: -6px -6px 18px rgb(24 24 27 / 10%);
     }
-
-    #auto-toggle[aria-pressed="true"]:hover {
-      background: #15803d;
+    .utility-toggle .rainbow-arrow {
+      display: inline-block;
+      color: #f00;
+      animation: rainbow 2s linear infinite;
     }
+    @keyframes rainbow {
+      0% { color: #ef4444; }
+      17% { color: #f97316; }
+      33% { color: #eab308; }
+      50% { color: #22c55e; }
+      67% { color: #3b82f6; }
+      83% { color: #a855f7; }
+      100% { color: #ef4444; }
+    }
+    .utility-content { display: grid; gap: 10px; }
+    .utility-bubble {
+      margin: 0;
+      padding: 11px 13px;
+      border: 1px solid #e4e4e7;
+      border-radius: 14px;
+      background: #f8fafc;
+      font-size: .9rem;
+      font-weight: 600;
+    }
+    .utility-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .utility-top .utility-bubble { flex: 1; }
+    .utility-top .utility-button { min-width: 76px; padding: 10px 12px; }
+    .utility-button[aria-pressed="true"] { background: #16a34a; }
+    .utility-button[aria-pressed="true"]:hover { background: #15803d; }
+    .utility-button.add-clicks { width: 100%; background: #2563eb; }
+    .utility-button.add-clicks:hover { background: #1d4ed8; }
 
     .fact-popup {
       position: fixed;
@@ -184,7 +189,6 @@
       box-shadow: 0 8px 26px rgb(0 0 0 / 24%);
       animation: popup-appear 180ms ease-out;
     }
-
     .fact-popup__bar {
       min-height: 34px;
       display: flex;
@@ -197,21 +201,8 @@
       touch-action: none;
       user-select: none;
     }
-
-    .fact-popup__bar:active {
-      cursor: grabbing;
-    }
-
-    .fact-popup__tab {
-      max-width: 180px;
-      overflow: hidden;
-      color: #424650;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
+    .fact-popup__bar:active { cursor: grabbing; }
+    .fact-popup__tab { max-width: 180px; overflow: hidden; color: #424650; font-size: .75rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
     .fact-popup__close {
       width: 26px;
       height: 26px;
@@ -226,36 +217,12 @@
       cursor: pointer;
       transition: background 120ms ease, color 120ms ease;
     }
-
-    .fact-popup__close:hover {
-      background: #dc2626;
-      color: #fff;
-    }
-
-    .fact-popup__body {
-      min-height: 92px;
-      display: grid;
-      align-content: center;
-      padding: 14px;
-    }
-
-    .fact-popup__body p {
-      margin: 0;
-      font-size: 0.875rem;
-      line-height: 1.45;
-    }
-
-    @keyframes popup-appear {
-      from { opacity: 0; transform: scale(.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
+    .fact-popup__close:hover { background: #dc2626; color: #fff; }
+    .fact-popup__body { min-height: 92px; display: grid; align-content: center; padding: 14px; }
+    .fact-popup__body p { margin: 0; font-size: .875rem; line-height: 1.45; }
+    @keyframes popup-appear { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-      }
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
     }
   </style>
 </head>
@@ -278,23 +245,33 @@
     </div>
   </aside>
 
+  <aside class="utility-drawer" id="utility-drawer" aria-label="Click tools">
+    <button class="utility-toggle" id="utility-toggle" type="button" aria-label="Open click tools" aria-expanded="false" aria-controls="utility-content"><span class="rainbow-arrow" aria-hidden="true">↖</span></button>
+    <div class="utility-content" id="utility-content" aria-hidden="true">
+      <div class="utility-top">
+        <p class="utility-bubble">Autoclicker | Use Only If Needed</p>
+        <button class="utility-button" id="clicker-toggle" type="button" aria-pressed="false">Off</button>
+      </div>
+      <button class="utility-button add-clicks" type="button" data-add="1000">Add 1,000 Clicks</button>
+      <button class="utility-button add-clicks" type="button" data-add="10000">Add 10,000 Clicks</button>
+      <button class="utility-button add-clicks" type="button" data-add="100000">Add 100,000 Clicks</button>
+    </div>
+  </aside>
+
   <script>
     const SAVE_KEY = 'click-counter-save';
     let clicks = 0;
     let rebirths = 0;
     let autoRebirth = false;
+    let autoclicker = false;
+    let autoclickerTimer = null;
 
     try {
       const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
-      if (saved && Number.isSafeInteger(saved.clicks) && saved.clicks >= 0) {
-        clicks = saved.clicks;
-      }
-      if (saved && Number.isSafeInteger(saved.rebirths) && saved.rebirths >= 0) {
-        rebirths = saved.rebirths;
-      }
-      if (saved && typeof saved.autoRebirth === 'boolean') {
-        autoRebirth = saved.autoRebirth;
-      }
+      if (saved && Number.isSafeInteger(saved.clicks) && saved.clicks >= 0) clicks = saved.clicks;
+      if (saved && Number.isSafeInteger(saved.rebirths) && saved.rebirths >= 0) rebirths = saved.rebirths;
+      if (saved && typeof saved.autoRebirth === 'boolean') autoRebirth = saved.autoRebirth;
+      if (saved && typeof saved.autoclicker === 'boolean') autoclicker = saved.autoclicker;
     } catch (error) {
       console.warn('Could not load the saved game.', error);
     }
@@ -305,10 +282,14 @@
     const drawerToggle = document.querySelector('#drawer-toggle');
     const drawerContent = document.querySelector('#drawer-content');
     const autoToggle = document.querySelector('#auto-toggle');
+    const utilityDrawer = document.querySelector('#utility-drawer');
+    const utilityToggle = document.querySelector('#utility-toggle');
+    const utilityContent = document.querySelector('#utility-content');
+    const clickerToggle = document.querySelector('#clicker-toggle');
 
     function saveGame() {
       try {
-        localStorage.setItem(SAVE_KEY, JSON.stringify({ clicks, rebirths, autoRebirth }));
+        localStorage.setItem(SAVE_KEY, JSON.stringify({ clicks, rebirths, autoRebirth, autoclicker }));
       } catch (error) {
         console.warn('Could not save the game in this browser.', error);
       }
@@ -319,23 +300,24 @@
       rebirthCount.textContent = `Rebirths: ${rebirths}`;
       autoToggle.setAttribute('aria-pressed', String(autoRebirth));
       autoToggle.textContent = autoRebirth ? 'Auto On' : 'Auto Off';
+      clickerToggle.setAttribute('aria-pressed', String(autoclicker));
+      clickerToggle.textContent = autoclicker ? 'On' : 'Off';
+    }
+
+    function awardClicks(amount) {
+      clicks += amount;
+      if (autoRebirth) {
+        const earnedRebirths = Math.floor(clicks / 100);
+        clicks %= 100;
+        rebirths += earnedRebirths;
+      }
+      updateCounter();
+      saveGame();
     }
 
     updateCounter();
 
-    document.querySelector('#action-button').addEventListener('click', () => {
-      clicks += 1;
-
-      if (autoRebirth) {
-        while (clicks >= 100) {
-          clicks -= 100;
-          rebirths += 1;
-        }
-      }
-
-      updateCounter();
-      saveGame();
-    });
+    document.querySelector('#action-button').addEventListener('click', () => awardClicks(1));
 
     drawerToggle.addEventListener('click', () => {
       const isOpen = drawer.classList.toggle('is-open');
@@ -347,17 +329,45 @@
 
     autoToggle.addEventListener('click', () => {
       autoRebirth = !autoRebirth;
-
       if (autoRebirth && clicks >= 100) {
-        while (clicks >= 100) {
-          clicks -= 100;
-          rebirths += 1;
-        }
+        rebirths += Math.floor(clicks / 100);
+        clicks %= 100;
       }
-
       updateCounter();
       saveGame();
     });
+
+    utilityToggle.addEventListener('click', () => {
+      const isOpen = utilityDrawer.classList.toggle('is-open');
+      utilityToggle.setAttribute('aria-expanded', String(isOpen));
+      utilityToggle.setAttribute('aria-label', isOpen ? 'Close click tools' : 'Open click tools');
+      utilityToggle.innerHTML = `<span class="rainbow-arrow" aria-hidden="true">${isOpen ? '↘' : '↖'}</span>`;
+      utilityContent.setAttribute('aria-hidden', String(!isOpen));
+    });
+
+    document.querySelectorAll('.add-clicks').forEach((button) => {
+      button.addEventListener('click', () => awardClicks(Number(button.dataset.add)));
+    });
+
+    function stopAutoclicker() {
+      if (autoclickerTimer !== null) {
+        window.clearInterval(autoclickerTimer);
+        autoclickerTimer = null;
+      }
+    }
+
+    function startAutoclicker() {
+      stopAutoclicker();
+      if (autoclicker) autoclickerTimer = window.setInterval(() => awardClicks(1), 100);
+    }
+
+    clickerToggle.addEventListener('click', () => {
+      autoclicker = !autoclicker;
+      startAutoclicker();
+      updateCounter();
+      saveGame();
+    });
+    startAutoclicker();
 
     const funFacts = [
       'Octopuses have three hearts, and two of them stop beating when they swim.',
@@ -377,14 +387,11 @@
       const popup = document.createElement('section');
       popup.className = 'fact-popup';
       popup.setAttribute('aria-label', "Tyran's ad: random fun fact");
-
       const bar = document.createElement('div');
       bar.className = 'fact-popup__bar';
-
       const tab = document.createElement('span');
       tab.className = 'fact-popup__tab';
       tab.textContent = "tyran's ad";
-
       const close = document.createElement('button');
       close.className = 'fact-popup__close';
       close.type = 'button';
@@ -392,9 +399,8 @@
       close.textContent = '×';
       close.addEventListener('click', () => popup.remove());
       bar.append(tab, close);
-
-      const body = document.createElement('div');
-      body.className = 'fact-popup__body';
+      const factBody = document.createElement('div');
+      factBody.className = 'fact-popup__body';
       const fact = document.createElement('p');
       let factIndex = Math.floor(Math.random() * funFacts.length);
       if (funFacts.length > 1 && factIndex === previousFactIndex) {
@@ -402,18 +408,14 @@
       }
       previousFactIndex = factIndex;
       fact.textContent = funFacts[factIndex];
-      body.append(fact);
-      popup.append(bar, body);
+      factBody.append(fact);
+      popup.append(bar, factBody);
       document.body.append(popup);
-
-      const placePopup = () => {
-        const margin = 8;
-        const maxX = Math.max(margin, window.innerWidth - popup.offsetWidth - margin);
-        const maxY = Math.max(margin, window.innerHeight - popup.offsetHeight - margin);
-        popup.style.left = `${margin + Math.random() * (maxX - margin)}px`;
-        popup.style.top = `${margin + Math.random() * (maxY - margin)}px`;
-      };
-      placePopup();
+      const margin = 8;
+      const maxX = Math.max(margin, window.innerWidth - popup.offsetWidth - margin);
+      const maxY = Math.max(margin, window.innerHeight - popup.offsetHeight - margin);
+      popup.style.left = `${margin + Math.random() * (maxX - margin)}px`;
+      popup.style.top = `${margin + Math.random() * (maxY - margin)}px`;
 
       let drag = null;
       bar.addEventListener('pointerdown', (event) => {
@@ -424,17 +426,14 @@
       });
       bar.addEventListener('pointermove', (event) => {
         if (!drag) return;
-        const maxX = Math.max(0, window.innerWidth - popup.offsetWidth);
-        const maxY = Math.max(0, window.innerHeight - popup.offsetHeight);
-        popup.style.left = `${Math.max(0, Math.min(maxX, event.clientX - drag.x))}px`;
-        popup.style.top = `${Math.max(0, Math.min(maxY, event.clientY - drag.y))}px`;
+        const maxLeft = Math.max(0, window.innerWidth - popup.offsetWidth);
+        const maxTop = Math.max(0, window.innerHeight - popup.offsetHeight);
+        popup.style.left = `${Math.max(0, Math.min(maxLeft, event.clientX - drag.x))}px`;
+        popup.style.top = `${Math.max(0, Math.min(maxTop, event.clientY - drag.y))}px`;
       });
       const stopDragging = () => { drag = null; };
       bar.addEventListener('pointerup', stopDragging);
       bar.addEventListener('pointercancel', stopDragging);
-      window.addEventListener('resize', () => {
-        if (popup.isConnected) placePopup();
-      }, { once: true });
     }
 
     window.setInterval(showRandomFact, 5000);

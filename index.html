@@ -18,7 +18,7 @@
         document.open();
         document.write(html);
         document.close();
-        for (const file of ['panel-lock.js', 'token-fix.js', 'credit-banner.js']) {
+        for (const file of ['panel-lock.js', 'token-fix.js', 'credit-banner.js', 'shutdown-visuals.js']) {
           const script = document.createElement('script');
           script.src = new URL(file, window.location.href).href;
           script.onerror = () => console.error(`Could not load ${file}.`);

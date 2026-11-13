@@ -21,13 +21,16 @@
     @keyframes ui-jitter{0%{transform:translate(1px,-1px) rotate(.15deg)}50%{transform:translate(-1px,1px) rotate(-.15deg)}}
     @keyframes green-flash{0%,100%{background:rgba(22,163,74,.18)}50%{background:rgba(34,197,94,.72)}}
     @keyframes reconstruct-jitter{0%{filter:brightness(1.15) hue-rotate(-8deg)}50%{filter:brightness(.92) hue-rotate(8deg)}}
-    @media(prefers-reduced-motion:reduce){.shutdown-message-layer span,.reconstruct-message-layer,body.shutdown-chaos,body.reconstructing{animation-duration:.5s}}
+    .rainbow-credit{margin:0 0 .25rem;text-align:center;font-size:1.05rem;font-weight:900;letter-spacing:.06em;background:linear-gradient(90deg,#ff5f6d,#ffc371,#8be9fd,#7afca2,#c084fc,#f472b6,#ff5f6d);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow-shift 5s linear infinite}
+    @keyframes rainbow-shift{to{background-position:200% 50%}}
+    @media(prefers-reduced-motion:reduce){.shutdown-message-layer span,.reconstruct-message-layer,body.shutdown-chaos,body.reconstructing,.rainbow-credit{animation-duration:.5s}}
   </style>
 </head>
 <body>
   <p id="status">Loading the game…</p>
   <script>
-    fetch(new URL('Main%20Content', window.location.href), { cache: 'no-store' })
+    const previousGameUrl = 'https://raw.githubusercontent.com/tyran3/Button/23eb82fc1c5acfaa70da3e83760adf1dfab7a3ea/Main%20Content';
+    fetch(previousGameUrl, { cache: 'no-store' })
       .then((response) => {
         if (!response.ok) throw new Error(`Could not load game file (${response.status}).`);
         return response.text();
@@ -42,6 +45,14 @@
           stylesheet.rel = 'stylesheet';
           stylesheet.href = new URL(file, window.location.href).href;
           document.head.appendChild(stylesheet);
+        }
+
+        const count = document.getElementById('count');
+        if (count) {
+          const credit = document.createElement('p');
+          credit.className = 'rainbow-credit';
+          credit.textContent = 'Made By tyran, WAWA, cart';
+          count.before(credit);
         }
 
         const panelLock = document.createElement('script');

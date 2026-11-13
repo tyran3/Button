@@ -44,35 +44,9 @@
           document.head.appendChild(stylesheet);
         }
 
-        // The game markup is written before these listeners are installed.
-        // Handle the clock explicitly and keep the two visible countdowns in sync.
-        document.addEventListener('click', (event) => {
-          const target = event.target instanceof Element ? event.target : event.target.parentElement;
-          const clockButton = target && target.closest('#clock-toggle');
-          if (!clockButton) return;
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          const panel = document.getElementById('time-panel');
-          if (!panel) return;
-          const expanded = panel.classList.toggle('open');
-          clockButton.setAttribute('aria-expanded', String(expanded));
-          panel.setAttribute('aria-hidden', String(!expanded));
-        }, true);
-
-        const syncCountdown = () => {
-          const timer = document.getElementById('timer-label');
-          const status = document.getElementById('event-status');
-          if (!timer || !status) return;
-          const label = timer.textContent.trim();
-          // Leave shutdown/celebration status messages alone.
-          if (/^\d+\s+Seconds\s*\|/i.test(label) && status.textContent.trim() !== label) {
-            status.textContent = label;
-          }
-        };
-        syncCountdown();
-        new MutationObserver(syncCountdown).observe(document.body, {
-          childList: true, characterData: true, subtree: true
-        });
+        const panelLock = document.createElement('script');
+        panelLock.src = new URL('panel-lock.js', window.location.href).href;
+        document.body.appendChild(panelLock);
 
         const effects = document.createElement('script');
         effects.src = new URL('shutdown-effects.js', window.location.href).href;

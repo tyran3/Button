@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/svg+xml" href="f-button.svg">
-  <title>Counter Clicker</title>
+  <title>Click Counter</title>
   <style>
     * { box-sizing: border-box; }
 

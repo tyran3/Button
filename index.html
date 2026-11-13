@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="f-button.svg">
   <title>Click Counter</title>
   <style>
     * {
@@ -163,8 +164,12 @@
     }
 
     #auto-toggle[aria-pressed="true"] {
-      background: #991b1b;
+      background: #16a34a;
       box-shadow: inset 0 0 0 2px rgb(255 255 255 / 35%);
+    }
+
+    #auto-toggle[aria-pressed="true"]:hover {
+      background: #15803d;
     }
 
     @media (prefers-reduced-motion: reduce) {

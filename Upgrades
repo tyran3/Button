@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loading Pirate Shop Token Clicker…</title>
+  <style>
+    body{font:16px system-ui,sans-serif;min-height:100vh;display:grid;place-items:center;margin:0;color:#18181b;background:#f4f4f5}
+    p{padding:1rem}
+  </style>
+</head>
+<body>
+  <p id="status">Loading the game…</p>
+  <script>
+    function replaceRequired(source, before, after, description) {
+      if (!source.includes(before)) throw new Error(`Could not apply game update: ${description}`);
+      return source.replace(before, after);
+    }
+
+    function updateGameHtml(html) {
+      html = replaceRequired(html,
+        `    .auto-row {`,
+        `    #upgrade-count, #upgrade-price, #upgrade-multiplier { display:block; margin-top:4px; color:#52525b; font-size:.85rem; font-weight:500; }
+    #upgrade-buy:disabled { opacity:.5; cursor:not-allowed; }
+
+    .auto-row {`,
+        'upgrade styles');
+
+      html = replaceRequired(html,
+        `      <div class="bubble">\n        <p>Rebirth</p>\n        <small id="rebirth-count">Rebirths: 0</small>\n      </div>`,
+        `      <div class="bubble">\n        <p>Rebirth</p>\n        <small id="rebirth-count">Rebirths: 0</small>\n      </div>\n      <div class="bubble auto-row" id="upgrade-bubble">\n        <p>UPGRADES\n          <small id="upgrade-count">0/50 Upgrades</small>\n          <small id="upgrade-price">Price: 250 clicks</small>\n          <small id="upgrade-multiplier">Click multiplier: 1.00x</small>\n        </p>\n        <button class="toggle-button" id="upgrade-buy" type="button">Upgrade</button>\n      </div>`,
+        'upgrade panel');
+
+      html = replaceRequired(html,
+        `    let pirateTokens = 0;`,
+        `    let pirateTokens = 0;\n    let upgrades = 0;`,
+        'upgrade state');
+      html = replaceRequired(html,
+        `      if (saved && Number.isSafeInteger(saved.pirateTokens) && saved.pirateTokens >= 0) pirateTokens = saved.pirateTokens;`,
+        `      if (saved && Number.isSafeInteger(saved.pirateTokens) && saved.pirateTokens >= 0) pirateTokens = saved.pirateTokens;\n      if (saved && Number.isSafeInteger(saved.upgrades) && saved.upgrades >= 0) upgrades = Math.min(50, saved.upgrades);`,
+        'upgrade save loading');
+      html = replaceRequired(html,
+        `    const tokenOdds = () => Math.max(1, BASE_TOKEN_ODDS - rebirths * 1001);`,
+        `    const tokenOdds = () => Math.max(1, BASE_TOKEN_ODDS - rebirths * 1001);\n    const upgradePrice = () => Math.round(250 * Math.pow(1.16, upgrades));\n    const clickMultiplier = () => Math.pow(1.1, upgrades);`,
+        'upgrade progression formulas');
+      html = replaceRequired(html,
+        `          clicks, rebirths, pirateTokens, autoRebirth`,
+        `          clicks, rebirths, pirateTokens, autoRebirth, upgrades`,
+        'upgrade saving');
+      html = replaceRequired(html,
+        `      $('#token-count').textContent = pirateTokens.toLocaleString();`,
+        `      $('#token-count').textContent = pirateTokens.toLocaleString();\n      $('#upgrade-count').textContent = [0m\`\u001b[0m${'${upgrades}'}/50 Upgrades\`;\n      $('#upgrade-price').textContent = upgrades >= 50 ? 'Maximum upgrades reached' : \`Price: ${'${upgradePrice().toLocaleString()}'} clicks\`;\n      $('#upgrade-multiplier').textContent = \`Click multiplier: ${'${clickMultiplier().toFixed(2)}'}x\`;\n      $('#upgrade-buy').disabled = upgrades >= 50 || clicks < upgradePrice();`,
+        'upgrade display');
+      html = replaceRequired(html,
+        `      clicks = Math.min(Number.MAX_SAFE_INTEGER, clicks + amount);`,
+        `      clicks = Math.min(Number.MAX_SAFE_INTEGER, clicks + Math.floor(amount * clickMultiplier()));`,
+        'click multiplier');
+      html = replaceRequired(html,
+        `    $('#rebirth-auto').addEventListener('click', () => {`,
+        `    $('#upgrade-buy').addEventListener('click', () => {\n      const price = upgradePrice();\n      if (upgrades >= 50 || clicks < price || phase !== 'rolling') return;\n      clicks -= price;\n      upgrades += 1;\n      updateUI();\n      saveGame();\n    });\n\n    $('#rebirth-auto').addEventListener('click', () => {`,
+        'upgrade purchase handler');
+      html = replaceRequired(html,
+        `      if (awardToken) {\n        pirateTokens += 1;`,
+        `      if (awardToken) {\n        pirateTokens += 1;\n        rebirths = 0;`,
+        'reset rebirths when a token is awarded');
+
+      return html;
+    }
+
+    fetch(new URL('Main%20Content', window.location.href), { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Could not load game file (${response.status}).`);
+        return response.text();
+      })
+      .then(updateGameHtml)
+      .then((html) => {
+        document.open();
+        document.write(html);
+        document.close();
+        for (const file of ['panel-lock.js', 'credit-banner.js', 'shutdown-visuals.js']) {
+          const script = document.createElement('script');
+          script.src = new URL(file, window.location.href).href;
+          script.onerror = () => console.error(`Could not load ${file}.`);
+          document.body.appendChild(script);
+        }
+      })
+      .catch((error) => {
+        document.querySelector('#status').textContent =
+          `The game could not be loaded. Please check the Main Content file. ${error.message}`;
+        console.error(error);
+      });
+  </script>
+</body>
+</html>

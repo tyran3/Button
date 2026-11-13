@@ -21,10 +21,12 @@
         document.open();
         document.write(html);
         document.close();
-        const panelLock = document.createElement('script');
-        panelLock.src = new URL('panel-lock.js', window.location.href).href;
-        panelLock.onerror = () => console.error('Could not load the Tyran panel lock.');
-        document.body.appendChild(panelLock);
+        for (const file of ['panel-lock.js', 'token-fix.js']) {
+          const script = document.createElement('script');
+          script.src = new URL(file, window.location.href).href;
+          script.onerror = () => console.error(`Could not load ${file}.`);
+          document.body.appendChild(script);
+        }
       })
       .catch((error) => {
         document.querySelector('#status').textContent =
